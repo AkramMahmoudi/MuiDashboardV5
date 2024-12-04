@@ -105,5 +105,13 @@ module.exports = {
         'internal-pattern': ['src/**'],
       },
     ],
+    'import/no-extraneous-dependencies': [
+      'error',
+      {
+        devDependencies: false, // Allow dev dependencies like eslint or test-related packages
+        optionalDependencies: false,
+        peerDependencies: false,
+      },
+    ],
   },
 };
