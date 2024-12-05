@@ -31,12 +31,21 @@ export function UserTableHead({
   return (
     <TableHead>
       <TableRow>
-        <TableCell padding="checkbox">
+        {/* <TableCell padding="checkbox">
           <Checkbox
             indeterminate={numSelected > 0 && numSelected < rowCount}
             checked={rowCount > 0 && numSelected === rowCount}
             onChange={(event: React.ChangeEvent<HTMLInputElement>) =>
               onSelectAllRows(event.target.checked)
+            }
+          />
+        </TableCell> */}
+        <TableCell padding="checkbox">
+          <Checkbox
+            indeterminate={numSelected > 0 && numSelected < rowCount}
+            checked={rowCount > 0 && numSelected === rowCount}
+            onChange={
+              (event: React.ChangeEvent<HTMLInputElement>) => onSelectAllRows(event.target.checked) // Pass the checked value directly
             }
           />
         </TableCell>
