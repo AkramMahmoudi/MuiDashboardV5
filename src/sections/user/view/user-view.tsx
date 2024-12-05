@@ -152,7 +152,7 @@ import { UserTableRow } from '../user-table-row';
 import { UserTableHead } from '../user-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
 import { UserTableToolbar } from '../user-table-toolbar';
-import { emptyRows, applyFilter, getComparator } from '../utils';
+import { emptyRows, emptyRowsv2, applyFilter, getComparator } from '../utils';
 
 // Define the structure of a user and the response
 interface User {
@@ -163,60 +163,46 @@ interface User {
   role: string;
 }
 
-interface TransformedUser extends User {
-  status: string;
-  company: string;
-  avatarUrl: string;
-  isVerified: boolean;
-}
-
 interface UserResponse {
   data: User[];
-  total: number;
-  total_pages: number;
   current_page: number;
   per_page: number;
-  next_page: number | null;
-  prev_page: number | null;
+  total: number;
 }
 
 export function UserView() {
-  const table = useTable();
   const [filterName, setFilterName] = useState('');
-  const [users, setUsers] = useState<TransformedUser[]>([]);
-  const [totalUsers, setTotalUsers] = useState(0);
+  const [users, setUsers] = useState<User[]>([]);
+  const [page, setPage] = useState(0); // Tracks current page (0-based index for MUI)
+  const [rowsPerPage, setRowsPerPage] = useState(10); // Default rows per page
+  const [totalUsers, setTotalUsers] = useState(0); // Total users count
 
-  // Fetch data from API and transform it
-  const fetchUsers = async (page = 1, rowsPerPage = 10) => {
+  // Fetch users based on page and rows per page
+  const fetchUsers = async (p = 1) => {
     try {
-      const response = await axios.get<UserResponse>(`http://192.168.1.2:3000/users`);
-      const { data, total } = response.data;
+      const response = await axios.get<UserResponse>(`http://192.168.1.9:3000/api/users?page=${p}`);
 
-      // Transform users to include the missing properties
-      const transformedUsers = data.map((user) => ({
-        ...user,
-        id: String(user.id), // Convert id to string
-        status: 'active', // Default or derive the value
-        company: 'Unknown', // Default or derive the value
-        avatarUrl: '', // Default or derive the value
-        isVerified: true, // Default or derive the value
-      }));
-
-      setUsers(transformedUsers);
-      setTotalUsers(total);
+      const { data, per_page, total } = response.data;
+      setUsers(data); // Set the raw data directly
+      setRowsPerPage(per_page); // Set rows per page dynamically
+      setTotalUsers(total); // Update the total user count
     } catch (error) {
       console.error('Error fetching users:', error);
     }
   };
 
-  // Fetch users when the component mounts or pagination changes
+  // Fetch users when the component mounts or when the page changes
   useEffect(() => {
-    fetchUsers(table.page + 1, table.rowsPerPage);
-  }, [table.page, table.rowsPerPage]);
+    fetchUsers(page + 1); // Adjust to 1-based page index for the API
+  }, [page]);
+
+  const handlePageChange = (event: unknown, newPage: number) => {
+    setPage(newPage); // Update the page number
+  };
 
   const dataFiltered = applyFilter({
     inputData: users,
-    comparator: getComparator(table.order, table.orderBy),
+    comparator: getComparator('asc', 'name'),
     filterName,
   });
 
@@ -239,11 +225,11 @@ export function UserView() {
 
       <Card>
         <UserTableToolbar
-          numSelected={table.selected.length}
+          numSelected={0} // Adjust based on your selection logic
           filterName={filterName}
           onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
             setFilterName(event.target.value);
-            table.onResetPage();
+            setPage(0); // Reset to the first page when filter changes
           }}
         />
 
@@ -251,17 +237,12 @@ export function UserView() {
           <TableContainer sx={{ overflow: 'unset' }}>
             <Table sx={{ minWidth: 800 }}>
               <UserTableHead
-                order={table.order}
-                orderBy={table.orderBy}
+                order="asc"
+                orderBy="name"
                 rowCount={users.length}
-                numSelected={table.selected.length}
-                onSort={table.onSort}
-                onSelectAllRows={(checked) =>
-                  table.onSelectAllRows(
-                    checked,
-                    users.map((user) => user.id) // IDs are now strings
-                  )
-                }
+                numSelected={0} // Adjust based on your selection logic
+                onSort={() => {}} // Add sorting logic if needed
+                onSelectAllRows={() => {}} // Add selection logic if needed
                 headLabel={[
                   { id: 'name', label: 'Name' },
                   { id: 'username', label: 'Username' },
@@ -271,24 +252,21 @@ export function UserView() {
                 ]}
               />
               <TableBody>
-                {dataFiltered
-                  .slice(
-                    table.page * table.rowsPerPage,
-                    table.page * table.rowsPerPage + table.rowsPerPage
-                  )
-                  .map((row) => (
-                    <UserTableRow
-                      key={row.id}
-                      row={row}
-                      selected={table.selected.includes(row.id)}
-                      onSelectRow={() => table.onSelectRow(row.id)}
-                    />
-                  ))}
+                {dataFiltered.map((row) => (
+                  <UserTableRow
+                    key={row.id}
+                    row={row}
+                    selected={false} // Adjust based on your selection logic
+                    onSelectRow={() => {}} // Add selection logic if needed
+                  />
+                ))}
 
-                <TableEmptyRows
-                  height={68}
-                  emptyRows={emptyRows(table.page, table.rowsPerPage, users.length)}
-                />
+                {emptyRowsv2(page, rowsPerPage, totalUsers) > 0 && (
+                  <TableEmptyRows
+                    height={68} // Set the height for empty rows
+                    emptyRows={emptyRowsv2(page, rowsPerPage, totalUsers)}
+                  />
+                )}
 
                 {notFound && <TableNoData searchQuery={filterName} />}
               </TableBody>
@@ -298,81 +276,13 @@ export function UserView() {
 
         <TablePagination
           component="div"
-          page={table.page}
-          count={totalUsers}
-          rowsPerPage={table.rowsPerPage}
-          onPageChange={table.onChangePage}
-          rowsPerPageOptions={[5, 10, 25]}
-          onRowsPerPageChange={table.onChangeRowsPerPage}
+          page={page} // Current page (0-based for Material-UI)
+          count={totalUsers} // Total number of users from the API
+          rowsPerPage={rowsPerPage} // Rows per page
+          onPageChange={handlePageChange} // Handle page change
+          rowsPerPageOptions={[rowsPerPage]} // Fixed to the API's per_page value
         />
       </Card>
     </DashboardContent>
   );
-}
-
-// Custom hook for table functionality
-export function useTable() {
-  const [page, setPage] = useState(0);
-  const [orderBy, setOrderBy] = useState('name');
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [selected, setSelected] = useState<string[]>([]); // IDs are strings
-  const [order, setOrder] = useState<'asc' | 'desc'>('asc');
-
-  const onSort = useCallback(
-    (id: string) => {
-      const isAsc = orderBy === id && order === 'asc';
-      setOrder(isAsc ? 'desc' : 'asc');
-      setOrderBy(id);
-    },
-    [order, orderBy]
-  );
-
-  const onSelectAllRows = useCallback((checked: boolean, newSelecteds: string[]) => {
-    if (checked) {
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  }, []);
-
-  const onSelectRow = useCallback(
-    (inputValue: string) => {
-      const newSelected = selected.includes(inputValue)
-        ? selected.filter((value) => value !== inputValue)
-        : [...selected, inputValue];
-
-      setSelected(newSelected);
-    },
-    [selected]
-  );
-
-  const onResetPage = useCallback(() => {
-    setPage(0);
-  }, []);
-
-  const onChangePage = useCallback((event: unknown, newPage: number) => {
-    setPage(newPage);
-  }, []);
-
-  const onChangeRowsPerPage = useCallback(
-    (event: React.ChangeEvent<HTMLInputElement>) => {
-      setRowsPerPage(parseInt(event.target.value, 10));
-      onResetPage();
-    },
-    [onResetPage]
-  );
-
-  return {
-    page,
-    order,
-    onSort,
-    orderBy,
-    selected,
-    rowsPerPage,
-    onSelectRow,
-    onResetPage,
-    onChangePage,
-    onSelectAllRows,
-    onChangeRowsPerPage,
-  };
 }

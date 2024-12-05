@@ -13,12 +13,25 @@ export const visuallyHidden = {
   whiteSpace: 'nowrap',
   clip: 'rect(0 0 0 0)',
 } as const;
+//
+// by akram for my api because always ftech only 10 rows  ////////////
+export function emptyRowsv2(page: number, rowsPerPage: number, total: number) {
+  const currentRangeStart = page * rowsPerPage; // First row index for the current page
+  const currentRangeEnd = currentRangeStart + rowsPerPage; // Last row index for the current page
+
+  // If on the last page and there are fewer rows than rowsPerPage, calculate empty rows
+  return currentRangeEnd > total ? currentRangeEnd - total : 0;
+}
+
+
+
 
 // ----------------------------------------------------------------------
 
 export function emptyRows(page: number, rowsPerPage: number, arrayLength: number) {
   return page ? Math.max(0, (1 + page) * rowsPerPage - arrayLength) : 0;
 }
+
 
 // ----------------------------------------------------------------------
 
