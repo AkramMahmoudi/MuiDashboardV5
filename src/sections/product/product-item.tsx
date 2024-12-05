@@ -12,20 +12,17 @@ import { ColorPreview } from 'src/components/color-utils';
 // ----------------------------------------------------------------------
 
 export type ProductItemProps = {
-  id: string;
+  id: number; // Ensure the type matches the data type, you mentioned it's a number
   name: string;
-  price: number;
-  status: string;
-  coverUrl: string;
-  colors: string[];
-  priceSale: number | null;
+  sell_price: string;
+  quantity: number;
 };
 
 export function ProductItem({ product }: { product: ProductItemProps }) {
   const renderStatus = (
     <Label
       variant="inverted"
-      color={(product.status === 'sale' && 'error') || 'info'}
+      color={(product.name === 'sale' && 'error') || 'info'}
       sx={{
         zIndex: 9,
         top: 16,
@@ -34,7 +31,7 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
         textTransform: 'uppercase',
       }}
     >
-      {product.status}
+      {product.name}
     </Label>
   );
 
@@ -42,7 +39,7 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
     <Box
       component="img"
       alt={product.name}
-      src={product.coverUrl}
+      src={product.name}
       sx={{
         top: 0,
         width: 1,
@@ -63,17 +60,17 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
           textDecoration: 'line-through',
         }}
       >
-        {product.priceSale && fCurrency(product.priceSale)}
+        {product.sell_price && fCurrency(product.sell_price)}
       </Typography>
       &nbsp;
-      {fCurrency(product.price)}
+      {fCurrency(product.sell_price)}
     </Typography>
   );
 
   return (
     <Card>
       <Box sx={{ pt: '100%', position: 'relative' }}>
-        {product.status && renderStatus}
+        {product.name && renderStatus}
 
         {renderImg}
       </Box>
@@ -84,7 +81,7 @@ export function ProductItem({ product }: { product: ProductItemProps }) {
         </Link>
 
         <Box display="flex" alignItems="center" justifyContent="space-between">
-          <ColorPreview colors={product.colors} />
+          <ColorPreview colors={['red,orange,blue']} />
           {renderPrice}
         </Box>
       </Stack>
