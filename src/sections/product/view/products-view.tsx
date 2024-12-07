@@ -253,19 +253,21 @@ interface UserResponse {
 }
 
 export function ProductsView() {
-  const [filterName, setFilterName] = useState('');
-  const [users, setUsers] = useState<User[]>([]);
-  const [page, setPage] = useState(0);
-  const [rowsPerPage, setRowsPerPage] = useState(10);
-  const [totalUsers, setTotalUsers] = useState(0);
-  const [selected, setSelected] = useState<string[]>([]); // New state for selected rows
+  const [filterName, setFilterName] = useState(''); // Stores search query
+  const [users, setUsers] = useState<User[]>([]); // Stores the fetched product data
+  const [page, setPage] = useState(0); // Tracks the current page (0-indexed)
+  const [rowsPerPage, setRowsPerPage] = useState(10); // Number of rows per page
+  const [totalUsers, setTotalUsers] = useState(0); // Total number of products
+  const [selected, setSelected] = useState<string[]>([]); // Tracks selected rows
 
-  const fetchUsers = async (p = 1) => {
+  // Fetch users/products with optional search query and pagination
+  const fetchUsers = async (p = 1, query = '') => {
     try {
       const response = await axios.get<UserResponse>(
-        `http://192.168.1.9:3000/api/products?page=${p}`
+        `http://192.168.1.9:3000/api/products?page=${p}&name=${query}`
       );
       const { data, per_page, total } = response.data;
+
       setUsers(data);
       setRowsPerPage(per_page);
       setTotalUsers(total);
@@ -274,22 +276,23 @@ export function ProductsView() {
     }
   };
 
+  // Fetch data when page changes or when filterName updates
   useEffect(() => {
-    fetchUsers(page + 1);
-  }, [page]);
+    fetchUsers(page + 1, filterName); // Pass the current page and search query
+  }, [page, filterName]);
 
+  // Handle page change for pagination
   const handlePageChange = (event: unknown, newPage: number) => {
     setPage(newPage);
   };
 
-  const handleSelectAllRows = (checked: boolean) => {
-    if (checked) {
-      setSelected(users.map((user) => user.id)); // Select all users
-    } else {
-      setSelected([]); // Deselect all users
-    }
+  // Handle search bar input and reset to the first page
+  const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterName(event.target.value); // Update the search query
+    setPage(0); // Reset to the first page
   };
 
+  // Handle row selection
   const handleSelectRow = (id: string) => {
     setSelected(
       (prevSelected) =>
@@ -299,37 +302,38 @@ export function ProductsView() {
     );
   };
 
-  const dataFiltered = applyFilter({
-    inputData: users,
-    comparator: getComparator('asc', 'name'),
-    filterName,
-  });
+  // Handle "Select All" functionality
+  const handleSelectAllRows = (checked: boolean) => {
+    if (checked) {
+      setSelected(users.map((user) => user.id)); // Select all users
+    } else {
+      setSelected([]); // Deselect all users
+    }
+  };
 
-  const notFound = !dataFiltered.length && !!filterName;
+  // Check if no results are found for the search query
+  const notFound = !users.length && !!filterName;
 
   return (
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
-          Users
+          Products
         </Typography>
         <Button
           variant="contained"
           color="inherit"
           startIcon={<Iconify icon="mingcute:add-line" />}
         >
-          New user
+          New Product
         </Button>
       </Box>
 
       <Card>
         <UserTableToolbar
-          numSelected={selected.length} // Update based on selection
+          numSelected={selected.length}
           filterName={filterName}
-          onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
-            setFilterName(event.target.value);
-            setPage(0); // Reset to the first page when filter changes
-          }}
+          onFilterName={handleSearch} // Update on input change
         />
 
         <Scrollbar>
@@ -341,32 +345,32 @@ export function ProductsView() {
                 rowCount={users.length}
                 numSelected={selected.length}
                 onSort={() => {}}
-                onSelectAllRows={handleSelectAllRows} // This will pass the checked boolean directly
+                onSelectAllRows={handleSelectAllRows}
                 headLabel={[
                   { id: 'name', label: 'Name' },
-                  { id: 'sell_price', label: 'price' },
-                  { id: 'quantity', label: 'quantity' },
-                  { id: 'barcode', label: 'barcode' },
+                  { id: 'sell_price', label: 'Price' },
+                  { id: 'quantity', label: 'Quantity' },
+                  { id: 'barcode', label: 'Barcode' },
                   { id: '' },
                 ]}
               />
 
               <TableBody>
-                {dataFiltered.map((row) => (
+                {users.map((row) => (
                   <UserTableRow
                     key={row.id}
                     row={row}
-                    selected={selected.includes(row.id)} // Check if the row is selected
-                    onSelectRow={() => handleSelectRow(row.id)} // Handle row selection
+                    selected={selected.includes(row.id)}
+                    onSelectRow={() => handleSelectRow(row.id)}
                   />
                 ))}
-
+                {/* 
                 {emptyRowsv2(page, rowsPerPage, totalUsers) > 0 && (
                   <TableEmptyRows
                     height={68}
                     emptyRows={emptyRowsv2(page, rowsPerPage, totalUsers)}
                   />
-                )}
+                )} */}
 
                 {notFound && <TableNoData searchQuery={filterName} />}
               </TableBody>
