@@ -790,11 +790,11 @@ export function ProductsView() {
     setRowBeingEdited(null); // Clear the edit state
 
     // Clear input values
-    if (nameRef.current) nameRef.current.value = '';
-    if (barcodeRef.current) barcodeRef.current.value = '';
-    if (priceRef.current) priceRef.current.value = '';
-    if (sellPriceRef.current) sellPriceRef.current.value = '';
-    if (quantityRef.current) quantityRef.current.value = '';
+    // if (nameRef.current) nameRef.current.value = '';
+    // if (barcodeRef.current) barcodeRef.current.value = '';
+    // if (priceRef.current) priceRef.current.value = '';
+    // if (sellPriceRef.current) sellPriceRef.current.value = '';
+    // if (quantityRef.current) quantityRef.current.value = '';
   };
 
   const handleSubmit = async () => {
@@ -828,11 +828,11 @@ export function ProductsView() {
     setOpenModal(true);
 
     // Populate the form with the product data
-    if (nameRef.current) nameRef.current.value = product.name;
-    if (barcodeRef.current) barcodeRef.current.value = product.barcode.toString();
-    if (priceRef.current) priceRef.current.value = product.sell_price.toString();
-    if (sellPriceRef.current) sellPriceRef.current.value = product.sell_price.toString();
-    if (quantityRef.current) quantityRef.current.value = product.quantity.toString();
+    // if (nameRef.current) nameRef.current.value = product.name;
+    // if (barcodeRef.current) barcodeRef.current.value = product.barcode.toString();
+    // if (priceRef.current) priceRef.current.value = product.sell_price.toString();
+    // if (sellPriceRef.current) sellPriceRef.current.value = product.sell_price.toString();
+    // if (quantityRef.current) quantityRef.current.value = product.quantity.toString();
   };
 
   const notFound = !users.length && !!filterName;
@@ -905,7 +905,7 @@ export function ProductsView() {
       </Card>
 
       {/* Modal for Adding Product */}
-      <Modal open={openModal} onClose={handleCloseModal}>
+      {/* <Modal open={openModal} onClose={handleCloseModal}>
         <Box
           sx={{
             position: 'absolute',
@@ -952,6 +952,89 @@ export function ProductsView() {
               type="number"
               inputRef={quantityRef}
               defaultValue={editProduct?.quantity || ''}
+              fullWidth
+            />
+          </Stack>
+          <Stack direction="row" spacing={2} mt={3}>
+            <Button variant="contained" onClick={handleSubmit}>
+              Submit
+            </Button>
+            <Button variant="outlined" onClick={handleCloseModal}>
+              Cancel
+            </Button>
+          </Stack>
+        </Box>
+      </Modal> */}
+      <Modal open={openModal} onClose={handleCloseModal}>
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 400,
+            bgcolor: 'background.paper',
+            p: 4,
+            borderRadius: 2,
+            boxShadow: 24,
+          }}
+        >
+          <Typography variant="h6" mb={2}>
+            {rowBeingEdited ? 'Edit Product' : 'Add New Product'}
+          </Typography>
+          <Stack spacing={2}>
+            <TextField
+              label="Name"
+              inputRef={nameRef}
+              value={rowBeingEdited?.name || ''}
+              onChange={(e) =>
+                setRowBeingEdited((prev) => (prev ? { ...prev, name: e.target.value } : null))
+              }
+              fullWidth
+            />
+            <TextField
+              label="Barcode"
+              inputRef={barcodeRef}
+              value={rowBeingEdited?.barcode || ''}
+              onChange={(e) =>
+                setRowBeingEdited((prev) =>
+                  prev ? { ...prev, barcode: parseInt(e.target.value, 10) || 0 } : null
+                )
+              }
+              fullWidth
+            />
+            <TextField
+              label="Price"
+              inputRef={priceRef}
+              value={rowBeingEdited?.price || ''}
+              onChange={(e) =>
+                setRowBeingEdited((prev) =>
+                  prev ? { ...prev, price: parseFloat(e.target.value) || 0 } : null
+                )
+              }
+              fullWidth
+            />
+            <TextField
+              label="Sell Price"
+              inputRef={sellPriceRef}
+              value={rowBeingEdited?.sell_price || ''}
+              onChange={(e) =>
+                setRowBeingEdited((prev) =>
+                  prev ? { ...prev, sell_price: parseFloat(e.target.value) || 0 } : null
+                )
+              }
+              fullWidth
+            />
+            <TextField
+              label="Quantity"
+              type="number"
+              inputRef={quantityRef}
+              value={rowBeingEdited?.quantity || ''}
+              onChange={(e) =>
+                setRowBeingEdited((prev) =>
+                  prev ? { ...prev, quantity: parseInt(e.target.value, 10) || 0 } : null
+                )
+              }
               fullWidth
             />
           </Stack>
