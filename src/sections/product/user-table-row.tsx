@@ -133,8 +133,8 @@ export type UserProps = {
   id: string;
   name: string;
   sell_price: number;
-  quantity: string;
-  barcode: string;
+  quantity: number;
+  barcode: number;
 };
 
 type UserTableRowProps = {
