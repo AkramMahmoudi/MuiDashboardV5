@@ -702,6 +702,7 @@ import { emptyRows, emptyRowsv2, applyFilter, getComparator } from '../utils';
 interface User {
   id: string;
   name: string;
+  price: number;
   sell_price: number;
   quantity: number;
   barcode: number;
@@ -721,9 +722,11 @@ export function ProductsView() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalUsers, setTotalUsers] = useState(0);
   const [selected, setSelected] = useState<string[]>([]);
+  const [rowBeingEdited, setRowBeingEdited] = useState<User | null>(null);
 
   // State for modal
   const [openModal, setOpenModal] = useState(false);
+  const [editProduct, setEditProduct] = useState<User | null>(null); // State for editing product
 
   // Input refs
   const nameRef = useRef<HTMLInputElement>(null);
@@ -777,12 +780,15 @@ export function ProductsView() {
     }
   };
 
-  const handleOpenModal = () => {
+  const handleOpenModal = (product: User | null = null) => {
+    setEditProduct(product); // Set the product being edited (null for new product)
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
     setOpenModal(false);
+    setRowBeingEdited(null); // Clear the edit state
+
     // Clear input values
     if (nameRef.current) nameRef.current.value = '';
     if (barcodeRef.current) barcodeRef.current.value = '';
@@ -794,6 +800,7 @@ export function ProductsView() {
   const handleSubmit = async () => {
     try {
       const payload = {
+        // id: rowBeingEdited?.id, // Use the ID of the product being edited
         name: nameRef.current?.value,
         barcode: barcodeRef.current?.value,
         price: Number(priceRef.current?.value),
@@ -801,12 +808,31 @@ export function ProductsView() {
         quantity: Number(quantityRef.current?.value),
       };
 
-      await axios.post('http://192.168.1.9:3000/api/product', payload);
+      const url = rowBeingEdited
+        ? `http://192.168.1.9:3000/api/product/${rowBeingEdited.id}`
+        : 'http://192.168.1.9:3000/api/product';
+
+      const method = rowBeingEdited ? 'put' : 'post';
+
+      await axios({ method, url, data: payload });
       handleCloseModal();
       fetchUsers(page + 1, filterName); // Refresh table data
+      setRowBeingEdited(null); // Clear the edit state
     } catch (error) {
-      console.error('Error adding product:', error);
+      console.error('Error saving product:', error);
     }
+  };
+
+  const handleEditProduct = (product: User) => {
+    setRowBeingEdited(product); // Set the product being edited
+    setOpenModal(true);
+
+    // Populate the form with the product data
+    if (nameRef.current) nameRef.current.value = product.name;
+    if (barcodeRef.current) barcodeRef.current.value = product.barcode.toString();
+    if (priceRef.current) priceRef.current.value = product.sell_price.toString();
+    if (sellPriceRef.current) sellPriceRef.current.value = product.sell_price.toString();
+    if (quantityRef.current) quantityRef.current.value = product.quantity.toString();
   };
 
   const notFound = !users.length && !!filterName;
@@ -821,7 +847,7 @@ export function ProductsView() {
           variant="contained"
           color="inherit"
           startIcon={<Iconify icon="mingcute:add-line" />}
-          onClick={handleOpenModal}
+          onClick={() => handleOpenModal()}
         >
           New Product
         </Button>
@@ -860,9 +886,9 @@ export function ProductsView() {
                     row={row}
                     selected={selected.includes(row.id)}
                     onSelectRow={() => handleSelectRow(row.id)}
+                    onEdit={handleEditProduct} // Pass the function here
                   />
                 ))}
-                {notFound && <TableNoData searchQuery={filterName} />}
               </TableBody>
             </Table>
           </TableContainer>
@@ -897,11 +923,37 @@ export function ProductsView() {
             Add New Product
           </Typography>
           <Stack spacing={2}>
-            <TextField label="Name" inputRef={nameRef} fullWidth />
-            <TextField label="Barcode" inputRef={barcodeRef} fullWidth />
-            <TextField label="Price" inputRef={priceRef} fullWidth />
-            <TextField label="Sell Price" inputRef={sellPriceRef} fullWidth />
-            <TextField label="Quantity" type="number" inputRef={quantityRef} fullWidth />
+            <TextField
+              label="Name"
+              inputRef={nameRef}
+              defaultValue={editProduct?.name || ''}
+              fullWidth
+            />
+            <TextField
+              label="Barcode"
+              inputRef={barcodeRef}
+              defaultValue={editProduct?.barcode || ''}
+              fullWidth
+            />
+            <TextField
+              label="Price"
+              inputRef={priceRef}
+              defaultValue={editProduct?.price || ''}
+              fullWidth
+            />
+            <TextField
+              label="Sell Price"
+              inputRef={sellPriceRef}
+              defaultValue={editProduct?.sell_price || ''}
+              fullWidth
+            />
+            <TextField
+              label="Quantity"
+              type="number"
+              inputRef={quantityRef}
+              defaultValue={editProduct?.quantity || ''}
+              fullWidth
+            />
           </Stack>
           <Stack direction="row" spacing={2} mt={3}>
             <Button variant="contained" onClick={handleSubmit}>
