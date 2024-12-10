@@ -19,9 +19,8 @@ export type UserProps = {
   price: number;
   sell_price: number;
   quantity: number;
-  barcode: number;
+  category_id: number; // إضافة category_id
 };
-
 type UserTableRowProps = {
   row: UserProps;
   selected: boolean;
@@ -57,7 +56,13 @@ export function UserTableRow({ row, selected, onSelectRow, onEdit }: UserTableRo
         <TableCell>{row.sell_price}</TableCell>
 
         <TableCell>{row.quantity}</TableCell>
-        <TableCell>{row.barcode}</TableCell>
+        {/* <TableCell>
+          {row.barcode.length > 0
+            ? row.barcode.map((item, index) => item.barcode).join(', ') // Extract and join barcodes
+            : 'N/A'}
+        </TableCell> */}
+        <TableCell>{row.category_id}</TableCell>
+
         {/* <TableCell align="center">
           {row.phone ? (
             <Iconify width={22} icon="solar:check-circle-bold" sx={{ color: 'success.main' }} />
