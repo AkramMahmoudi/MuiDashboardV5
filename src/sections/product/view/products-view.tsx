@@ -143,10 +143,10 @@ export function ProductsView() {
   const handleSubmit = async () => {
     try {
       // Convert string fields to numbers for the payload
-      const { id, category, barcode, price, sell_price, quantity, category_id, ...rest } = formData;
+      const { id, name, price, sell_price, quantity, category_id } = formData;
 
       const payload = {
-        ...rest,
+        name,
         price: Number(price),
         sell_price: Number(sell_price),
         quantity: Number(quantity),
