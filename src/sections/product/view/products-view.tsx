@@ -50,18 +50,18 @@ export function ProductsView() {
   const [rowsPerPage, setRowsPerPage] = useState(10);
   const [totalUsers, setTotalUsers] = useState(0);
   const [selected, setSelected] = useState<string[]>([]);
-  const [rowBeingEdited, setRowBeingEdited] = useState<User | null>(null);
+  const [formData, setFormData] = useState<User>({
+    id: '',
+    name: '',
+    price: 0,
+    sell_price: 0,
+    quantity: 0,
+    category_id: 0,
+  });
 
   // State for modal
   const [openModal, setOpenModal] = useState(false);
   const [editProduct, setEditProduct] = useState<User | null>(null); // State for editing product
-
-  // Input refs
-  const nameRef = useRef<HTMLInputElement>(null);
-  const priceRef = useRef<HTMLInputElement>(null);
-  const sellPriceRef = useRef<HTMLInputElement>(null);
-  const quantityRef = useRef<HTMLInputElement>(null);
-  const categoryRef = useRef<HTMLInputElement>(null);
 
   // Fetch users/products
   const fetchUsers = async (p = 1, query = '') => {
@@ -110,52 +110,60 @@ export function ProductsView() {
 
   const handleOpenModal = (product: User | null = null) => {
     if (product) {
-      // فتح للتعديل
-      if (nameRef.current) nameRef.current.value = product.name;
-      if (priceRef.current) priceRef.current.value = product.price.toString();
-      if (sellPriceRef.current) sellPriceRef.current.value = product.sell_price.toString();
-      if (quantityRef.current) quantityRef.current.value = product.quantity.toString();
-      if (categoryRef.current) categoryRef.current.value = product.category_id.toString();
-      setRowBeingEdited(product);
+      setFormData(product); // Set form data for editing
     } else {
-      // فتح للإضافة
-      if (nameRef.current) nameRef.current.value = '';
-      if (priceRef.current) priceRef.current.value = '';
-      if (sellPriceRef.current) sellPriceRef.current.value = '';
-      if (quantityRef.current) quantityRef.current.value = '';
-      if (categoryRef.current) categoryRef.current.value = '';
-      setRowBeingEdited(null);
+      setFormData({
+        id: '',
+        name: '',
+        price: 0,
+        sell_price: 0,
+        quantity: 0,
+        category_id: 0,
+      }); // Reset form for adding
     }
     setOpenModal(true);
   };
 
   const handleCloseModal = () => {
-    if (nameRef.current) nameRef.current.value = '';
-    if (priceRef.current) priceRef.current.value = '';
-    if (sellPriceRef.current) sellPriceRef.current.value = '';
-    if (quantityRef.current) quantityRef.current.value = '';
-    if (categoryRef.current) categoryRef.current.value = '';
-    setRowBeingEdited(null);
     setOpenModal(false);
+  };
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+
+    setFormData((prev) => ({
+      ...prev,
+      [name]:
+        name === 'price' || name === 'sell_price' || name === 'quantity' || name === 'category_id'
+          ? value // Keep as a string to allow intermediate values like "0"
+          : value,
+    }));
   };
 
   const handleSubmit = async () => {
     try {
+      // Convert string fields to numbers for the payload
+      const { id, category, barcode, price, sell_price, quantity, category_id, ...rest } = formData;
+
       const payload = {
-        name: nameRef.current?.value || '',
-        price: parseFloat(priceRef.current?.value || '0'),
-        sell_price: parseFloat(sellPriceRef.current?.value || '0'),
-        quantity: parseInt(quantityRef.current?.value || '0', 10),
-        category_id: parseInt(categoryRef.current?.value || '0', 10),
+        ...rest,
+        price: Number(price),
+        sell_price: Number(sell_price),
+        quantity: Number(quantity),
+        category_id: Number(category_id),
       };
 
-      const url = rowBeingEdited
-        ? `http://192.168.1.9:3000/api/product/${rowBeingEdited.id}`
+      const url = id
+        ? `http://192.168.1.9:3000/api/product/${id}`
         : 'http://192.168.1.9:3000/api/product';
+      const method = id ? 'put' : 'post';
 
-      const method = rowBeingEdited ? 'put' : 'post';
+      await axios({
+        method,
+        url,
+        data: payload,
+      });
 
-      await axios({ method, url, data: payload });
       handleCloseModal();
       fetchUsers(page + 1, filterName);
     } catch (error) {
@@ -253,64 +261,52 @@ export function ProductsView() {
           }}
         >
           <Typography variant="h6" mb={2}>
-            {rowBeingEdited ? 'Edit Product' : 'Add New Product'}
+            {formData.id ? 'Edit Product' : 'Add New Product'}
           </Typography>
           <Stack spacing={2}>
             <TextField
               label="Name"
-              inputRef={nameRef}
-              value={rowBeingEdited?.name || ''}
-              onChange={(e) =>
-                setRowBeingEdited((prev) => (prev ? { ...prev, name: e.target.value } : null))
-              }
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
               fullWidth
             />
 
             <TextField
               label="Price"
-              inputRef={priceRef}
-              value={rowBeingEdited?.price || ''}
-              onChange={(e) =>
-                setRowBeingEdited((prev) =>
-                  prev ? { ...prev, price: parseFloat(e.target.value) || 0 } : null
-                )
-              }
+              name="price"
+              type="number"
+              value={formData.price}
+              onChange={handleChange}
               fullWidth
+              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
             />
             <TextField
               label="Sell Price"
-              inputRef={sellPriceRef}
-              value={rowBeingEdited?.sell_price || ''}
-              onChange={(e) =>
-                setRowBeingEdited((prev) =>
-                  prev ? { ...prev, sell_price: parseFloat(e.target.value) || 0 } : null
-                )
-              }
+              name="sell_price"
+              type="number"
+              value={formData.sell_price}
+              onChange={handleChange}
               fullWidth
+              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
             />
             <TextField
               label="Quantity"
+              name="quantity"
               type="number"
-              inputRef={quantityRef}
-              value={rowBeingEdited?.quantity || ''}
-              onChange={(e) =>
-                setRowBeingEdited((prev) =>
-                  prev ? { ...prev, quantity: parseInt(e.target.value, 10) || 0 } : null
-                )
-              }
+              value={formData.quantity}
+              onChange={handleChange}
               fullWidth
+              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
             />
             <TextField
               label="Category ID"
+              name="category_id"
               type="number"
-              inputRef={categoryRef}
-              value={rowBeingEdited?.category_id || ''}
-              onChange={(e) =>
-                setRowBeingEdited((prev) =>
-                  prev ? { ...prev, category_id: parseInt(e.target.value, 10) || 0 } : null
-                )
-              }
+              value={formData.category_id}
+              onChange={handleChange}
               fullWidth
+              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
             />
           </Stack>
           <Stack direction="row" spacing={2} mt={3}>
