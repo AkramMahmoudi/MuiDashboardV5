@@ -13,6 +13,8 @@ import {
   Typography,
   TableContainer,
   Stack,
+  Snackbar,
+  Alert,
 } from '@mui/material';
 
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -36,7 +38,7 @@ interface User {
   quantity: number;
   category_id: number; // إضافة category_id
 }
-interface UserResponse {
+interface FetchResponse {
   data: User[];
   current_page: number;
   per_page: number;
@@ -58,6 +60,9 @@ export function ProductsView() {
     quantity: 0,
     category_id: 0,
   });
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const [snackbarMessage, setSnackbarMessage] = useState('');
+  const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
   // State for modal
   const [openModal, setOpenModal] = useState(false);
@@ -66,7 +71,7 @@ export function ProductsView() {
   // Fetch users/products
   const fetchUsers = async (p = 1, query = '') => {
     try {
-      const response = await axios.get<UserResponse>(
+      const response = await axios.get<FetchResponse>(
         `http://192.168.1.3:3000/api/products?page=${p}&name=${query}`
       );
       const { data, per_page, total } = response.data;
@@ -85,11 +90,21 @@ export function ProductsView() {
 
   const handleDelete = async (id: string) => {
     try {
-      await axios.delete(`http://192.168.1.3:3000/api/product/${id}`);
+      const response = await axios.delete(`http://192.168.1.3:3000/api/product/${id}`);
+      // console.log(response);
+      setSnackbarMessage(response.data as string);
+      setSnackbarSeverity('success');
       fetchUsers(page + 1, filterName); // Refresh the product list after deletion
-    } catch (error) {
-      console.error('Error deleting product:', error);
+    } catch (error: any) {
+      setSnackbarMessage(error.response?.data?.message || 'Failed to delete product.');
+      setSnackbarSeverity('error');
+      // console.error('Error deleting product:', error);
+    } finally {
+      setSnackbarOpen(true);
     }
+  };
+  const handleSnackbarClose = () => {
+    setSnackbarOpen(false);
   };
 
   const handlePageChange = (event: unknown, newPage: number) => {
@@ -167,16 +182,23 @@ export function ProductsView() {
         : 'http://192.168.1.3:3000/api/product';
       const method = id ? 'put' : 'post';
 
-      await axios({
+      const response = await axios({
         method,
         url,
         data: payload,
       });
 
+      setSnackbarMessage('Product Added successfully');
+      setSnackbarSeverity('success');
+
       handleCloseModal();
       fetchUsers(page + 1, filterName);
-    } catch (error) {
-      console.error('Error saving product:', error);
+    } catch (error: any) {
+      // console.error('Error saving product:', error);
+      setSnackbarMessage(error.response?.data);
+      setSnackbarSeverity('error');
+    } finally {
+      setSnackbarOpen(true); // Show the snackbar
     }
   };
 
@@ -254,6 +276,16 @@ export function ProductsView() {
           rowsPerPageOptions={[rowsPerPage]}
         />
       </Card>
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={3000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+      >
+        <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
+          {snackbarMessage}
+        </Alert>
+      </Snackbar>
 
       {/* Modal for Adding Product */}
       <Modal open={openModal} onClose={handleCloseModal}>
