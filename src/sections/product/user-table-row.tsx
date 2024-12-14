@@ -26,9 +26,10 @@ type UserTableRowProps = {
   selected: boolean;
   onSelectRow: () => void;
   onEdit: (row: UserProps) => void; // New prop
+  onDelete: () => void;
 };
 
-export function UserTableRow({ row, selected, onSelectRow, onEdit }: UserTableRowProps) {
+export function UserTableRow({ row, selected, onSelectRow, onEdit, onDelete }: UserTableRowProps) {
   const [openPopover, setOpenPopover] = useState<HTMLButtonElement | null>(null);
 
   const handleOpenPopover = useCallback((event: React.MouseEvent<HTMLButtonElement>) => {
@@ -106,7 +107,7 @@ export function UserTableRow({ row, selected, onSelectRow, onEdit }: UserTableRo
             <Iconify icon="akar-icons:edit" sx={{ mr: 1 }} />
             Edit
           </MenuItem>
-          <MenuItem>
+          <MenuItem onClick={onDelete}>
             <Iconify icon="eva:trash-2-outline" sx={{ mr: 1 }} />
             Delete
           </MenuItem>

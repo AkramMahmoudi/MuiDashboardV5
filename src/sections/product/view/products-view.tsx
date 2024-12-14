@@ -67,7 +67,7 @@ export function ProductsView() {
   const fetchUsers = async (p = 1, query = '') => {
     try {
       const response = await axios.get<UserResponse>(
-        `http://192.168.1.9:3000/api/products?page=${p}&name=${query}`
+        `http://192.168.1.3:3000/api/products?page=${p}&name=${query}`
       );
       const { data, per_page, total } = response.data;
 
@@ -82,6 +82,15 @@ export function ProductsView() {
   useEffect(() => {
     fetchUsers(page + 1, filterName);
   }, [page, filterName]);
+
+  const handleDelete = async (id: string) => {
+    try {
+      await axios.delete(`http://192.168.1.3:3000/api/product/${id}`);
+      fetchUsers(page + 1, filterName); // Refresh the product list after deletion
+    } catch (error) {
+      console.error('Error deleting product:', error);
+    }
+  };
 
   const handlePageChange = (event: unknown, newPage: number) => {
     setPage(newPage);
@@ -154,8 +163,8 @@ export function ProductsView() {
       };
 
       const url = id
-        ? `http://192.168.1.9:3000/api/product/${id}`
-        : 'http://192.168.1.9:3000/api/product';
+        ? `http://192.168.1.3:3000/api/product/${id}`
+        : 'http://192.168.1.3:3000/api/product';
       const method = id ? 'put' : 'post';
 
       await axios({
@@ -228,6 +237,7 @@ export function ProductsView() {
                     selected={selected.includes(row.id)}
                     onSelectRow={() => {}}
                     onEdit={() => handleOpenModal(row)}
+                    onDelete={() => handleDelete(row.id)}
                   />
                 ))}
               </TableBody>
