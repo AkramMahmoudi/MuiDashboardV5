@@ -227,9 +227,13 @@ export function ProductsView() {
         url,
         data: payload,
       });
-
-      setSnackbarMessage('Product Added successfully');
-      setSnackbarSeverity('success');
+      if (method === 'put') {
+        setSnackbarMessage('Product Edited successfully');
+        setSnackbarSeverity('success');
+      } else {
+        setSnackbarMessage('Product Added successfully');
+        setSnackbarSeverity('success');
+      }
 
       handleCloseModal();
       fetchUsers(page + 1, filterName);
