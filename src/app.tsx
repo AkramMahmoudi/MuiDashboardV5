@@ -15,12 +15,9 @@ import { Iconify } from 'src/components/iconify';
 export default function App() {
   useScrollToTop();
 
-  
-
   return (
     <ThemeProvider>
       <Router />
-      
     </ThemeProvider>
   );
 }

@@ -15,6 +15,7 @@ import {
   Stack,
   Snackbar,
   Alert,
+  CircularProgress,
 } from '@mui/material';
 
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -64,6 +65,8 @@ export function ProductsView() {
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState<'success' | 'error'>('success');
 
+  const [loading, setLoading] = useState(false);
+
   // State for modal
   const [openModal, setOpenModal] = useState(false);
   const [editProduct, setEditProduct] = useState<User | null>(null); // State for editing product
@@ -72,7 +75,7 @@ export function ProductsView() {
   const fetchUsers = async (p = 1, query = '') => {
     try {
       const response = await axios.get<FetchResponse>(
-        `http://192.168.1.3:3000/api/products?page=${p}&name=${query}`
+        `http://192.168.1.4:3000/api/products?page=${p}&name=${query}`
       );
       const { data, per_page, total } = response.data;
 
@@ -90,7 +93,7 @@ export function ProductsView() {
 
   const handleDelete = async (id: string) => {
     try {
-      const response = await axios.delete(`http://192.168.1.3:3000/api/product/${id}`);
+      const response = await axios.delete(`http://192.168.1.4:3000/api/product/${id}`);
       // console.log(response);
       setSnackbarMessage(response.data as string);
       setSnackbarSeverity('success');
@@ -165,6 +168,7 @@ export function ProductsView() {
   };
 
   const handleSubmit = async () => {
+    setLoading(true);
     try {
       // Convert string fields to numbers for the payload
       const { id, name, price, sell_price, quantity, category_id } = formData;
@@ -178,11 +182,11 @@ export function ProductsView() {
       };
 
       const url = id
-        ? `http://192.168.1.3:3000/api/product/${id}`
-        : 'http://192.168.1.3:3000/api/product';
+        ? `http://192.168.1.4:3000/api/product/${id}`
+        : 'http://192.168.1.4:3000/api/product';
       const method = id ? 'put' : 'post';
 
-      const response = await axios({
+      await axios({
         method,
         url,
         data: payload,
@@ -198,6 +202,7 @@ export function ProductsView() {
       setSnackbarMessage(error.response?.data);
       setSnackbarSeverity('error');
     } finally {
+      setLoading(false);
       setSnackbarOpen(true); // Show the snackbar
     }
   };
@@ -352,8 +357,13 @@ export function ProductsView() {
             />
           </Stack>
           <Stack direction="row" spacing={2} mt={3}>
-            <Button variant="contained" onClick={handleSubmit}>
-              Submit
+            <Button
+              variant="contained"
+              onClick={handleSubmit}
+              disabled={loading}
+              startIcon={loading && <CircularProgress size={20} />}
+            >
+              {loading ? 'Submitting...' : 'Submit'}
             </Button>
             <Button variant="outlined" onClick={handleCloseModal}>
               Cancel

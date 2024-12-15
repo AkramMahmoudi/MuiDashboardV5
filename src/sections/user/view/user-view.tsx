@@ -48,7 +48,7 @@ export function UserView() {
 
   const fetchUsers = async (p = 1) => {
     try {
-      const response = await axios.get<UserResponse>(`http://192.168.1.3:3000/api/users?page=${p}`);
+      const response = await axios.get<UserResponse>(`http://192.168.1.4:3000/api/users?page=${p}`);
       const { data, per_page, total } = response.data;
       setUsers(data);
       setRowsPerPage(per_page);
