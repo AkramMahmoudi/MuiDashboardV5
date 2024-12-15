@@ -129,6 +129,7 @@ export function ProductsView() {
     if (!productToDelete) return;
 
     try {
+      setLoading(true);
       const response = await axios.delete(`http://192.168.1.4:3000/api/product/${productToDelete}`);
       setSnackbarMessage(response.data as string);
       setSnackbarSeverity('success');
@@ -137,6 +138,7 @@ export function ProductsView() {
       setSnackbarMessage(error.response?.data?.message || 'Failed to delete product.');
       setSnackbarSeverity('error');
     } finally {
+      setLoading(false);
       setSnackbarOpen(true);
       handleCloseConfirmDialog();
     }
@@ -227,13 +229,8 @@ export function ProductsView() {
         url,
         data: payload,
       });
-      if (method === 'put') {
-        setSnackbarMessage('Product Edited successfully');
-        setSnackbarSeverity('success');
-      } else {
-        setSnackbarMessage('Product Added successfully');
-        setSnackbarSeverity('success');
-      }
+      setSnackbarMessage(id ? 'Product updated successfully!' : 'Product added successfully!');
+      setSnackbarSeverity('success');
 
       handleCloseModal();
       fetchUsers(page + 1, filterName);
@@ -302,7 +299,7 @@ export function ProductsView() {
                     key={row.id}
                     row={row}
                     selected={selected.includes(row.id)}
-                    onSelectRow={() => {}}
+                    onSelectRow={() => handleSelectRow(row.id)}
                     onEdit={() => handleOpenModal(row)}
                     onDelete={() => handleOpenConfirmDialog(row.id)}
                   />
@@ -343,8 +340,17 @@ export function ProductsView() {
           <Button onClick={handleCloseConfirmDialog} variant="outlined">
             Cancel
           </Button>
-          <Button onClick={handleConfirmDelete} variant="contained" color="error">
+          {/* <Button onClick={handleConfirmDelete} variant="contained" color="error">
             Delete
+          </Button> */}
+          <Button
+            variant="contained"
+            onClick={handleConfirmDelete}
+            color="error"
+            disabled={loading}
+            startIcon={loading && <CircularProgress size={20} />}
+          >
+            {loading ? 'Deleting...' : 'Delete'}
           </Button>
         </DialogActions>
       </Dialog>
