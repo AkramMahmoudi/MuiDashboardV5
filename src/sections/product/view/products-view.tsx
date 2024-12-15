@@ -16,6 +16,11 @@ import {
   Snackbar,
   Alert,
   CircularProgress,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
 } from '@mui/material';
 
 import { DashboardContent } from 'src/layouts/dashboard';
@@ -71,6 +76,9 @@ export function ProductsView() {
   const [openModal, setOpenModal] = useState(false);
   const [editProduct, setEditProduct] = useState<User | null>(null); // State for editing product
 
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
+
   // Fetch users/products
   const fetchUsers = async (p = 1, query = '') => {
     try {
@@ -91,21 +99,49 @@ export function ProductsView() {
     fetchUsers(page + 1, filterName);
   }, [page, filterName]);
 
-  const handleDelete = async (id: string) => {
+  // const handleDelete = async (id: string) => {
+  //   try {
+  //     const response = await axios.delete(`http://192.168.1.4:3000/api/product/${id}`);
+  //     // console.log(response);
+  //     setSnackbarMessage(response.data as string);
+  //     setSnackbarSeverity('success');
+  //     fetchUsers(page + 1, filterName); // Refresh the product list after deletion
+  //   } catch (error: any) {
+  //     setSnackbarMessage(error.response?.data?.message || 'Failed to delete product.');
+  //     setSnackbarSeverity('error');
+  //     // console.error('Error deleting product:', error);
+  //   } finally {
+  //     setSnackbarOpen(true);
+  //   }
+  // };
+
+  const handleOpenConfirmDialog = (id: string) => {
+    setProductToDelete(id);
+    setConfirmDialogOpen(true);
+  };
+
+  const handleCloseConfirmDialog = () => {
+    setProductToDelete(null);
+    setConfirmDialogOpen(false);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!productToDelete) return;
+
     try {
-      const response = await axios.delete(`http://192.168.1.4:3000/api/product/${id}`);
-      // console.log(response);
+      const response = await axios.delete(`http://192.168.1.4:3000/api/product/${productToDelete}`);
       setSnackbarMessage(response.data as string);
       setSnackbarSeverity('success');
       fetchUsers(page + 1, filterName); // Refresh the product list after deletion
     } catch (error: any) {
       setSnackbarMessage(error.response?.data?.message || 'Failed to delete product.');
       setSnackbarSeverity('error');
-      // console.error('Error deleting product:', error);
     } finally {
       setSnackbarOpen(true);
+      handleCloseConfirmDialog();
     }
   };
+
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
@@ -264,7 +300,7 @@ export function ProductsView() {
                     selected={selected.includes(row.id)}
                     onSelectRow={() => {}}
                     onEdit={() => handleOpenModal(row)}
-                    onDelete={() => handleDelete(row.id)}
+                    onDelete={() => handleOpenConfirmDialog(row.id)}
                   />
                 ))}
               </TableBody>
@@ -291,6 +327,23 @@ export function ProductsView() {
           {snackbarMessage}
         </Alert>
       </Snackbar>
+      {/* Confirmation Dialog */}
+      <Dialog open={confirmDialogOpen} onClose={handleCloseConfirmDialog}>
+        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogContent>
+          <DialogContentText>
+            Are you sure you want to delete this product? This action cannot be undone.
+          </DialogContentText>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseConfirmDialog} variant="outlined">
+            Cancel
+          </Button>
+          <Button onClick={handleConfirmDelete} variant="contained" color="error">
+            Delete
+          </Button>
+        </DialogActions>
+      </Dialog>
 
       {/* Modal for Adding Product */}
       <Modal open={openModal} onClose={handleCloseModal}>
