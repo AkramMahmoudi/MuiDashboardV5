@@ -2,7 +2,7 @@ import ReactDOM from 'react-dom/client';
 import { Suspense, StrictMode } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
-import { UserPage } from './routes/sections';
+import { ClientPage } from './routes/sections';
 import App from './app';
 
 // ----------------------------------------------------------------------
