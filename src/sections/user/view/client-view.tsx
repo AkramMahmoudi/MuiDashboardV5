@@ -50,7 +50,7 @@ interface FetchResponse {
   total: number;
 }
 
-export function UserView() {
+export function ClientView() {
   const [filterName, setFilterName] = useState('');
   const [users, setUsers] = useState<User[]>([]);
   const [page, setPage] = useState(0);
