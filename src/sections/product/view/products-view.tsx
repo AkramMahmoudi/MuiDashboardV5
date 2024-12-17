@@ -2,8 +2,8 @@ import axios from 'axios';
 import React, { useRef, useState, useEffect } from 'react';
 
 import {
-  Button,
   Box,
+  Button,
   Card,
   Modal,
   Table,
@@ -34,6 +34,8 @@ import { TableEmptyRows } from '../table-empty-rows';
 import { UserTableToolbar } from '../user-table-toolbar';
 import { emptyRows, emptyRowsv2, applyFilter, getComparator } from '../utils';
 
+import { fetchData } from '../../apiService';
+
 // Define the structure of a user and the response
 
 interface User {
@@ -44,12 +46,12 @@ interface User {
   quantity: number;
   category_id: number; // إضافة category_id
 }
-interface FetchResponse {
-  data: User[];
-  current_page: number;
-  per_page: number;
-  total: number;
-}
+// interface FetchResponse {
+//   data: User[];
+//   current_page: number;
+//   per_page: number;
+//   total: number;
+// }
 
 export function ProductsView() {
   const [filterName, setFilterName] = useState('');
@@ -80,13 +82,13 @@ export function ProductsView() {
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
   // Fetch users/products
-  const fetchUsers = async (p = 1, query = '') => {
+  const fetchUsers = async (p: number, fName: string) => {
     try {
-      const response = await axios.get<FetchResponse>(
-        `http://192.168.1.9:3000/api/products?page=${p}&name=${query}`
+      const { data, per_page, total } = await fetchData<User>(
+        'http://192.168.1.9:3000/api/products',
+        p,
+        fName
       );
-      console.log(response.data);
-      const { data, per_page, total } = response.data;
 
       setUsers(data);
       setRowsPerPage(per_page);
@@ -99,22 +101,6 @@ export function ProductsView() {
   useEffect(() => {
     fetchUsers(page + 1, filterName);
   }, [page, filterName]);
-
-  // const handleDelete = async (id: string) => {
-  //   try {
-  //     const response = await axios.delete(`http://192.168.1.4:3000/api/product/${id}`);
-  //     // console.log(response);
-  //     setSnackbarMessage(response.data as string);
-  //     setSnackbarSeverity('success');
-  //     fetchUsers(page + 1, filterName); // Refresh the product list after deletion
-  //   } catch (error: any) {
-  //     setSnackbarMessage(error.response?.data?.message || 'Failed to delete product.');
-  //     setSnackbarSeverity('error');
-  //     // console.error('Error deleting product:', error);
-  //   } finally {
-  //     setSnackbarOpen(true);
-  //   }
-  // };
 
   const handleOpenConfirmDialog = (id: string) => {
     setProductToDelete(id);
