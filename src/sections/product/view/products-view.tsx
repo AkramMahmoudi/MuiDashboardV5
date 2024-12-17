@@ -83,8 +83,9 @@ export function ProductsView() {
   const fetchUsers = async (p = 1, query = '') => {
     try {
       const response = await axios.get<FetchResponse>(
-        `http://192.168.1.5:3000/api/products?page=${p}&name=${query}`
+        `http://192.168.1.9:3000/api/products?page=${p}&name=${query}`
       );
+      console.log(response.data);
       const { data, per_page, total } = response.data;
 
       setUsers(data);
@@ -130,7 +131,7 @@ export function ProductsView() {
 
     try {
       setLoading(true);
-      const response = await axios.delete(`http://192.168.1.5:3000/api/product/${productToDelete}`);
+      const response = await axios.delete(`http://192.168.1.9:3000/api/product/${productToDelete}`);
       setSnackbarMessage(response.data as string);
       setSnackbarSeverity('success');
       fetchUsers(page + 1, filterName); // Refresh the product list after deletion
@@ -220,8 +221,8 @@ export function ProductsView() {
       };
 
       const url = id
-        ? `http://192.168.1.5:3000/api/product/${id}`
-        : 'http://192.168.1.5:3000/api/product';
+        ? `http://192.168.1.9:3000/api/product/${id}`
+        : 'http://192.168.1.9:3000/api/product';
       const method = id ? 'put' : 'post';
 
       await axios({

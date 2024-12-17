@@ -1,175 +1,3 @@
-// import axios from 'axios';
-// import React, { useState, useEffect } from 'react';
-
-// import Box from '@mui/material/Box';
-// import Card from '@mui/material/Card';
-// import Table from '@mui/material/Table';
-// import Button from '@mui/material/Button';
-// import TableBody from '@mui/material/TableBody';
-// import Typography from '@mui/material/Typography';
-// import TableContainer from '@mui/material/TableContainer';
-// import TablePagination from '@mui/material/TablePagination';
-
-// import { DashboardContent } from 'src/layouts/dashboard';
-
-// import { Iconify } from 'src/components/iconify';
-// import { Scrollbar } from 'src/components/scrollbar';
-
-// import { TableNoData } from '../table-no-data';
-// import { UserTableRow } from '../user-table-row';
-// import { UserTableHead } from '../user-table-head';
-// import { TableEmptyRows } from '../table-empty-rows';
-// import { UserTableToolbar } from '../user-table-toolbar';
-// import { emptyRows, emptyRowsv2, applyFilter, getComparator } from '../utils';
-
-// // Define the structure of a user and the response
-// interface User {
-//   id: string;
-//   name: string;
-//   username: string;
-//   phone: string;
-//   role: string;
-// }
-
-// interface UserResponse {
-//   data: User[];
-//   current_page: number;
-//   per_page: number;
-//   total: number;
-// }
-
-// export function UserView() {
-//   const [filterName, setFilterName] = useState('');
-//   const [users, setUsers] = useState<User[]>([]);
-//   const [page, setPage] = useState(0);
-//   const [rowsPerPage, setRowsPerPage] = useState(10);
-//   const [totalUsers, setTotalUsers] = useState(0);
-//   const [selected, setSelected] = useState<string[]>([]); // New state for selected rows
-
-//   const fetchUsers = async (p = 1) => {
-//     try {
-//       const response = await axios.get<UserResponse>(`http://192.168.1.4:3000/api/users?page=${p}`);
-//       const { data, per_page, total } = response.data;
-//       setUsers(data);
-//       setRowsPerPage(per_page);
-//       setTotalUsers(total);
-//     } catch (error) {
-//       console.error('Error fetching users:', error);
-//     }
-//   };
-
-//   useEffect(() => {
-//     fetchUsers(page + 1);
-//   }, [page]);
-
-//   const handlePageChange = (event: unknown, newPage: number) => {
-//     setPage(newPage);
-//   };
-
-//   const handleSelectAllRows = (checked: boolean) => {
-//     if (checked) {
-//       setSelected(users.map((user) => user.id)); // Select all users
-//     } else {
-//       setSelected([]); // Deselect all users
-//     }
-//   };
-
-//   const handleSelectRow = (id: string) => {
-//     setSelected(
-//       (prevSelected) =>
-//         prevSelected.includes(id)
-//           ? prevSelected.filter((selectedId) => selectedId !== id) // Deselect the row
-//           : [...prevSelected, id] // Select the row
-//     );
-//   };
-
-//   const dataFiltered = applyFilter({
-//     inputData: users,
-//     comparator: getComparator('asc', 'name'),
-//     filterName,
-//   });
-
-//   const notFound = !dataFiltered.length && !!filterName;
-
-//   return (
-//     <DashboardContent>
-//       <Box display="flex" alignItems="center" mb={5}>
-//         <Typography variant="h4" flexGrow={1}>
-//           Users
-//         </Typography>
-//         <Button
-//           variant="contained"
-//           color="inherit"
-//           startIcon={<Iconify icon="mingcute:add-line" />}
-//         >
-//           New user
-//         </Button>
-//       </Box>
-
-//       <Card>
-//         <UserTableToolbar
-//           numSelected={selected.length} // Update based on selection
-//           filterName={filterName}
-//           onFilterName={(event: React.ChangeEvent<HTMLInputElement>) => {
-//             setFilterName(event.target.value);
-//             setPage(0); // Reset to the first page when filter changes
-//           }}
-//         />
-
-//         <Scrollbar>
-//           <TableContainer sx={{ overflow: 'unset' }}>
-//             <Table sx={{ minWidth: 800 }}>
-//               <UserTableHead
-//                 order="asc"
-//                 orderBy="name"
-//                 rowCount={users.length}
-//                 numSelected={selected.length}
-//                 onSort={() => {}}
-//                 onSelectAllRows={handleSelectAllRows} // This will pass the checked boolean directly
-//                 headLabel={[
-//                   { id: 'name', label: 'Name' },
-//                   { id: 'username', label: 'Username' },
-//                   { id: 'phone', label: 'Phone' },
-//                   { id: 'role', label: 'Role' },
-//                   { id: '' },
-//                 ]}
-//               />
-
-//               <TableBody>
-//                 {dataFiltered.map((row) => (
-//                   <UserTableRow
-//                     key={row.id}
-//                     row={row}
-//                     selected={selected.includes(row.id)} // Check if the row is selected
-//                     onSelectRow={() => handleSelectRow(row.id)} // Handle row selection
-//                   />
-//                 ))}
-
-//                 {emptyRowsv2(page, rowsPerPage, totalUsers) > 0 && (
-//                   <TableEmptyRows
-//                     height={68}
-//                     emptyRows={emptyRowsv2(page, rowsPerPage, totalUsers)}
-//                   />
-//                 )}
-
-//                 {notFound && <TableNoData searchQuery={filterName} />}
-//               </TableBody>
-//             </Table>
-//           </TableContainer>
-//         </Scrollbar>
-
-//         <TablePagination
-//           component="div"
-//           page={page}
-//           count={totalUsers}
-//           rowsPerPage={rowsPerPage}
-//           onPageChange={handlePageChange}
-//           rowsPerPageOptions={[rowsPerPage]}
-//         />
-//       </Card>
-//     </DashboardContent>
-//   );
-// }
 import axios from 'axios';
 import React, { useRef, useState, useEffect } from 'react';
 
@@ -211,9 +39,9 @@ import { emptyRows, emptyRowsv2, applyFilter, getComparator } from '../utils';
 interface User {
   id: string;
   name: string;
-  username: string;
   phone: string;
-  role: string; // إضافة category_id
+  montant: number;
+  ancien: number;
 }
 interface FetchResponse {
   data: User[];
@@ -232,9 +60,9 @@ export function UserView() {
   const [formData, setFormData] = useState<User>({
     id: '',
     name: '',
-    username: '',
     phone: '',
-    role: '',
+    montant: 0,
+    ancien: 0,
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -253,8 +81,9 @@ export function UserView() {
   const fetchUsers = async (p = 1, query = '') => {
     try {
       const response = await axios.get<FetchResponse>(
-        `http://192.168.1.5:3000/api/users?page=${p}&name=${query}`
+        `http://192.168.1.9:3000/api/clients?page=${p}&name=${query}`
       );
+
       const { data, per_page, total } = response.data;
 
       setUsers(data);
@@ -300,7 +129,7 @@ export function UserView() {
 
     try {
       setLoading(true);
-      const response = await axios.delete(`http://192.168.1.5:3000/api/user/${productToDelete}`);
+      const response = await axios.delete(`http://192.168.1.9:3000/api/client/${productToDelete}`);
       setSnackbarMessage(response.data as string);
       setSnackbarSeverity('success');
       fetchUsers(page + 1, filterName); // Refresh the product list after deletion
@@ -350,9 +179,9 @@ export function UserView() {
       setFormData({
         id: '',
         name: '',
-        username: '',
         phone: '',
-        role: '',
+        montant: 0,
+        ancien: 0,
       }); // Reset form for adding
     }
     setOpenModal(true);
@@ -375,18 +204,18 @@ export function UserView() {
     setLoading(true);
     try {
       // Convert string fields to numbers for the payload
-      const { id, name, username, phone, role } = formData;
+      const { id, name, phone, montant, ancien } = formData;
 
       const payload = {
         name,
-        username,
         phone,
-        role,
+        montant: Number(montant),
+        ancien: Number(ancien),
       };
 
       const url = id
-        ? `http://192.168.1.5:3000/api/user/${id}`
-        : 'http://192.168.1.5:3000/api/user';
+        ? `http://192.168.1.9:3000/api/client/${id}`
+        : 'http://192.168.1.9:3000/api/client';
       const method = id ? 'put' : 'post';
 
       await axios({
@@ -420,7 +249,7 @@ export function UserView() {
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
-          Products
+          Clients
         </Typography>
         <Button
           variant="contained"
@@ -428,7 +257,7 @@ export function UserView() {
           startIcon={<Iconify icon="mingcute:add-line" />}
           onClick={() => handleOpenModal()}
         >
-          New Product
+          New Client
         </Button>
       </Box>
 
@@ -451,9 +280,9 @@ export function UserView() {
                 onSelectAllRows={handleSelectAllRows}
                 headLabel={[
                   { id: 'name', label: 'Name' },
-                  { id: 'username', label: 'UserName' },
-                  { id: 'phone', label: 'Phone' },
-                  { id: 'role', label: 'Role' },
+                  { id: 'phone', label: 'phone' },
+                  { id: 'montant', label: 'montant' },
+                  { id: 'ancien', label: 'ancien' },
                   { id: '', label: '' },
                 ]}
               />
@@ -536,7 +365,7 @@ export function UserView() {
           }}
         >
           <Typography variant="h6" mb={2}>
-            {formData.id ? 'Edit Product' : 'Add New Product'}
+            {formData.id ? 'Edit Client' : 'Add New Client'}
           </Typography>
           <Stack spacing={2}>
             <TextField
@@ -548,31 +377,26 @@ export function UserView() {
             />
 
             <TextField
-              label="Price"
-              name="price"
-              type="number"
-              value={formData.username}
-              onChange={handleChange}
-              fullWidth
-              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
-            />
-            <TextField
-              label="Sell Price"
-              name="sell_price"
-              type="number"
+              label="Phone"
+              name="phone"
               value={formData.phone}
               onChange={handleChange}
               fullWidth
-              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
             />
             <TextField
-              label="Quantity"
-              name="quantity"
-              type="number"
-              value={formData.role}
+              label="montant"
+              name="montant"
+              value={formData.montant}
               onChange={handleChange}
               fullWidth
-              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
+            />
+            <TextField
+              label="ancien"
+              name="ancien"
+              value={formData.ancien}
+              onChange={handleChange}
+              fullWidth
+              // inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
             />
           </Stack>
           <Stack direction="row" spacing={2} mt={3}>

@@ -16,9 +16,9 @@ import { Iconify } from 'src/components/iconify';
 export type UserProps = {
   id: string;
   name: string;
-  username: string;
   phone: string;
-  role: string;
+  montant: number;
+  ancien: number;
 };
 type UserTableRowProps = {
   row: UserProps;
@@ -55,14 +55,14 @@ export function UserTableRow({ row, selected, onSelectRow, onEdit, onDelete }: U
 
         <TableCell>{row.name}</TableCell>
 
-        <TableCell>{row.username}</TableCell>
+        <TableCell>{row.phone}</TableCell>
         {/* <TableCell>
           {row.barcode.length > 0
             ? row.barcode.map((item, index) => item.barcode).join(', ') // Extract and join barcodes
             : 'N/A'}
         </TableCell> */}
-        <TableCell>{row.phone}</TableCell>
-        <TableCell>{row.role}</TableCell>
+        <TableCell>{row.montant}</TableCell>
+        <TableCell>{row.ancien}</TableCell>
         {/* <TableCell align="center">
           {row.phone ? (
             <Iconify width={22} icon="solar:check-circle-bold" sx={{ color: 'success.main' }} />
