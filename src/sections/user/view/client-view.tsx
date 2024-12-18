@@ -27,11 +27,13 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 
+import { fetchData } from '../../apiService';
 import { TableNoData } from '../table-no-data';
 import { UserTableRow } from '../user-table-row';
 import { UserTableHead } from '../user-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
 import { UserTableToolbar } from '../user-table-toolbar';
+
 import { emptyRows, emptyRowsv2, applyFilter, getComparator } from '../utils';
 
 // Define the structure of a user and the response
@@ -43,12 +45,12 @@ interface User {
   montant: number;
   ancien: number;
 }
-interface FetchResponse {
-  data: User[];
-  current_page: number;
-  per_page: number;
-  total: number;
-}
+// interface FetchResponse {
+//   data: User[];
+//   current_page: number;
+//   per_page: number;
+//   total: number;
+// }
 
 export function ClientView() {
   const [filterName, setFilterName] = useState('');
@@ -78,13 +80,28 @@ export function ClientView() {
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
   // Fetch users/products
-  const fetchUsers = async (p = 1, query = '') => {
-    try {
-      const response = await axios.get<FetchResponse>(
-        `http://192.168.1.9:3000/api/clients?page=${p}&name=${query}`
-      );
+  // const fetchUsers = async (p = 1, query = '') => {
+  //   try {
+  //     const response = await axios.get<FetchResponse>(
+  //       `http://192.168.1.9:3000/api/clients?page=${p}&name=${query}`
+  //     );
 
-      const { data, per_page, total } = response.data;
+  //     const { data, per_page, total } = response.data;
+
+  //     setUsers(data);
+  //     setRowsPerPage(per_page);
+  //     setTotalUsers(total);
+  //   } catch (error) {
+  //     console.error('Error fetching users:', error);
+  //   }
+  // };
+  const fetchUsers = async (p: number, fName: string) => {
+    try {
+      const { data, per_page, total } = await fetchData<User>(
+        `${import.meta.env.VITE_API_BASE_URL}/api/clients`,
+        p,
+        fName
+      );
 
       setUsers(data);
       setRowsPerPage(per_page);

@@ -85,7 +85,7 @@ export function ProductsView() {
   const fetchUsers = async (p: number, fName: string) => {
     try {
       const { data, per_page, total } = await fetchData<User>(
-        'http://192.168.1.9:3000/api/products',
+        `${import.meta.env.VITE_API_BASE_URL}/api/products`,
         p,
         fName
       );
