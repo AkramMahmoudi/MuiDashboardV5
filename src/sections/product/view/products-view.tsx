@@ -32,9 +32,8 @@ import { UserTableRow } from '../user-table-row';
 import { UserTableHead } from '../user-table-head';
 import { TableEmptyRows } from '../table-empty-rows';
 import { UserTableToolbar } from '../user-table-toolbar';
+import { fetchData, handleConfirmDelete } from '../../apiService';
 import { emptyRows, emptyRowsv2, applyFilter, getComparator } from '../utils';
-
-import { fetchData } from '../../apiService';
 
 // Define the structure of a user and the response
 
@@ -111,26 +110,6 @@ export function ProductsView() {
     setProductToDelete(null);
     setConfirmDialogOpen(false);
   };
-
-  const handleConfirmDelete = async () => {
-    if (!productToDelete) return;
-
-    try {
-      setLoading(true);
-      const response = await axios.delete(`http://192.168.1.9:3000/api/product/${productToDelete}`);
-      setSnackbarMessage(response.data as string);
-      setSnackbarSeverity('success');
-      fetchUsers(page + 1, filterName); // Refresh the product list after deletion
-    } catch (error: any) {
-      setSnackbarMessage(error.response?.data?.message || 'Failed to delete product.');
-      setSnackbarSeverity('error');
-    } finally {
-      setLoading(false);
-      setSnackbarOpen(true);
-      handleCloseConfirmDialog();
-    }
-  };
-
   const handleSnackbarClose = () => {
     setSnackbarOpen(false);
   };
@@ -231,11 +210,6 @@ export function ProductsView() {
     }
   };
 
-  // const handleEditProduct = (product: User) => {
-  //   setRowBeingEdited(product); // Set the product being edited
-  //   setOpenModal(true);
-  // };
-
   // const notFound = !users.length && !!filterName;
 
   return (
@@ -327,12 +301,23 @@ export function ProductsView() {
           <Button onClick={handleCloseConfirmDialog} variant="outlined">
             Cancel
           </Button>
-          {/* <Button onClick={handleConfirmDelete} variant="contained" color="error">
-            Delete
-          </Button> */}
+
           <Button
+            onClick={() =>
+              handleConfirmDelete({
+                idToDelete: productToDelete,
+                setSnackbarMessage,
+                setSnackbarSeverity,
+                setSnackbarOpen,
+                setLoading,
+                fetchFunction: () => {
+                  fetchUsers(page + 1, filterName);
+                },
+                apiEndpoint: `${import.meta.env.VITE_API_BASE_URL}/api/product`,
+                closeDialog: handleCloseConfirmDialog,
+              })
+            }
             variant="contained"
-            onClick={handleConfirmDelete}
             color="error"
             disabled={loading}
             startIcon={loading && <CircularProgress size={20} />}

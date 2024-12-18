@@ -49,20 +49,20 @@ export function UserTableRow({ row, selected, onSelectRow, onEdit, onDelete }: U
         <TableCell component="th" scope="row">
           <Box gap={2} display="flex" alignItems="center">
             <Avatar alt={row.name} src={row.id} />
-            {/* {row.name} */}
+            {row.name}
           </Box>
         </TableCell>
 
-        <TableCell>{row.name}</TableCell>
-
         <TableCell>{row.phone}</TableCell>
+
+        <TableCell>{row.montant}</TableCell>
         {/* <TableCell>
           {row.barcode.length > 0
             ? row.barcode.map((item, index) => item.barcode).join(', ') // Extract and join barcodes
             : 'N/A'}
         </TableCell> */}
-        <TableCell>{row.montant}</TableCell>
         <TableCell>{row.ancien}</TableCell>
+        {/* <TableCell>{row.ancien}</TableCell> */}
         {/* <TableCell align="center">
           {row.phone ? (
             <Iconify width={22} icon="solar:check-circle-bold" sx={{ color: 'success.main' }} />

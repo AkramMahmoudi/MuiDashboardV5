@@ -27,7 +27,7 @@ import { DashboardContent } from 'src/layouts/dashboard';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
 
-import { fetchData } from '../../apiService';
+import { fetchData, handleConfirmDelete } from '../../apiService';
 import { TableNoData } from '../table-no-data';
 import { UserTableRow } from '../user-table-row';
 import { UserTableHead } from '../user-table-head';
@@ -79,22 +79,6 @@ export function ClientView() {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
 
-  // Fetch users/products
-  // const fetchUsers = async (p = 1, query = '') => {
-  //   try {
-  //     const response = await axios.get<FetchResponse>(
-  //       `http://192.168.1.9:3000/api/clients?page=${p}&name=${query}`
-  //     );
-
-  //     const { data, per_page, total } = response.data;
-
-  //     setUsers(data);
-  //     setRowsPerPage(per_page);
-  //     setTotalUsers(total);
-  //   } catch (error) {
-  //     console.error('Error fetching users:', error);
-  //   }
-  // };
   const fetchUsers = async (p: number, fName: string) => {
     try {
       const { data, per_page, total } = await fetchData<User>(
@@ -115,22 +99,6 @@ export function ClientView() {
     fetchUsers(page + 1, filterName);
   }, [page, filterName]);
 
-  // const handleDelete = async (id: string) => {
-  //   try {
-  //     const response = await axios.delete(`http://192.168.1.4:3000/api/product/${id}`);
-  //     // console.log(response);
-  //     setSnackbarMessage(response.data as string);
-  //     setSnackbarSeverity('success');
-  //     fetchUsers(page + 1, filterName); // Refresh the product list after deletion
-  //   } catch (error: any) {
-  //     setSnackbarMessage(error.response?.data?.message || 'Failed to delete product.');
-  //     setSnackbarSeverity('error');
-  //     // console.error('Error deleting product:', error);
-  //   } finally {
-  //     setSnackbarOpen(true);
-  //   }
-  // };
-
   const handleOpenConfirmDialog = (id: string) => {
     setProductToDelete(id);
     setConfirmDialogOpen(true);
@@ -139,25 +107,6 @@ export function ClientView() {
   const handleCloseConfirmDialog = () => {
     setProductToDelete(null);
     setConfirmDialogOpen(false);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!productToDelete) return;
-
-    try {
-      setLoading(true);
-      const response = await axios.delete(`http://192.168.1.9:3000/api/client/${productToDelete}`);
-      setSnackbarMessage(response.data as string);
-      setSnackbarSeverity('success');
-      fetchUsers(page + 1, filterName); // Refresh the product list after deletion
-    } catch (error: any) {
-      setSnackbarMessage(error.response?.data?.message || 'Failed to delete product.');
-      setSnackbarSeverity('error');
-    } finally {
-      setLoading(false);
-      setSnackbarOpen(true);
-      handleCloseConfirmDialog();
-    }
   };
 
   const handleSnackbarClose = () => {
@@ -351,12 +300,23 @@ export function ClientView() {
           <Button onClick={handleCloseConfirmDialog} variant="outlined">
             Cancel
           </Button>
-          {/* <Button onClick={handleConfirmDelete} variant="contained" color="error">
-            Delete
-          </Button> */}
+
           <Button
+            onClick={() =>
+              handleConfirmDelete({
+                idToDelete: productToDelete,
+                setSnackbarMessage,
+                setSnackbarSeverity,
+                setSnackbarOpen,
+                setLoading,
+                fetchFunction: () => {
+                  fetchUsers(page + 1, filterName);
+                },
+                apiEndpoint: `${import.meta.env.VITE_API_BASE_URL}/api/client`,
+                closeDialog: handleCloseConfirmDialog,
+              })
+            }
             variant="contained"
-            onClick={handleConfirmDelete}
             color="error"
             disabled={loading}
             startIcon={loading && <CircularProgress size={20} />}
