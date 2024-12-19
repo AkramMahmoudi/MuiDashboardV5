@@ -1,5 +1,5 @@
 import axios from 'axios';
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useRef, useState, useEffect, useCallback } from 'react';
 
 import {
   Box,
@@ -51,6 +51,23 @@ interface User {
 //   per_page: number;
 //   total: number;
 // }
+type Category = {
+  id: number;
+  name: string;
+  deleted_at: string | null;
+  created_at: string;
+  updated_at: string;
+  user_id: number | null;
+};
+type ApiResponse<T> = {
+  data: T;
+  total: number;
+  total_pages: number;
+  per_page: number;
+  current_page: number;
+  next_page: number | null;
+  prev_page: number | null;
+};
 
 export function ProductsView() {
   const [filterName, setFilterName] = useState('');
@@ -79,26 +96,50 @@ export function ProductsView() {
 
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  // category states
+  const [categories, setCategories] = useState<{ id: number; name: string }[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState<number | 'All'>('All');
 
-  // Fetch users/products
-  const fetchUsers = async (p: number, fName: string) => {
+  const fetchCategories = async () => {
     try {
-      const { data, per_page, total } = await fetchData<User>(
-        `${import.meta.env.VITE_API_BASE_URL}/api/products`,
-        { page: p, filter: fName }
+      const response = await axios.get<ApiResponse<Category[]>>(
+        `${import.meta.env.VITE_API_BASE_URL}/api/categories`
       );
 
-      setUsers(data);
-      setRowsPerPage(per_page);
-      setTotalUsers(total);
+      console.log(response.data.data); // الوصول إلى البيانات داخل الخاصية data
+      setCategories(response.data.data); // ضبط القيم في الحالة
     } catch (error) {
-      console.error('Error fetching users:', error);
+      console.error('Error fetching categories:', error);
     }
   };
 
+  // Fetch users/products
+  const fetchUsers = useCallback(
+    async (p: number, fName: string) => {
+      try {
+        const filter = selectedCategory === 'All' ? '' : `&category_id=${selectedCategory}`;
+        const { data, per_page, total } = await fetchData<User>(
+          `${import.meta.env.VITE_API_BASE_URL}/api/products`,
+          { page: p, filter: `${fName}${filter}` }
+        );
+
+        setUsers(data);
+        setRowsPerPage(per_page);
+        setTotalUsers(total);
+      } catch (error) {
+        console.error('Error fetching users:', error);
+      }
+    },
+    [selectedCategory]
+  );
+
   useEffect(() => {
     fetchUsers(page + 1, filterName);
-  }, [page, filterName]);
+  }, [page, filterName, fetchUsers]);
+
+  useEffect(() => {
+    fetchCategories();
+  }, []);
 
   const handleOpenConfirmDialog = (id: string) => {
     setProductToDelete(id);
@@ -232,6 +273,14 @@ export function ProductsView() {
           numSelected={selected.length}
           filterName={filterName}
           onFilterName={handleSearch}
+          categories={categories}
+          selectedCategory={selectedCategory}
+          onCategoryChange={(e) => {
+            const value = e.target.value === 'All' ? 'All' : Number(e.target.value);
+            setSelectedCategory(value);
+            setPage(0);
+            fetchUsers(1, filterName);
+          }}
         />
 
         <Scrollbar>
