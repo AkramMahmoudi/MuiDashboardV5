@@ -117,10 +117,21 @@ export function ProductsView() {
   const fetchUsers = useCallback(
     async (p: number, fName: string) => {
       try {
-        const filter = selectedCategory === 'All' ? '' : `&category_id=${selectedCategory}`;
+        // تحديد إذا كان الإدخال رقمًا أو نصًا
+        const isBarcode = /^\d+$/.test(fName); // يتحقق إذا كان fName يتكون فقط من أرقام
+        const name = isBarcode ? '' : fName;
+        const barcode = isBarcode ? fName : '';
+        const params = {
+          page: p,
+          name: name || undefined, // Include only if name is not empty
+          barcode: barcode || undefined, // Include only if barcode is not empty
+          category_id: selectedCategory !== 'All' ? selectedCategory : undefined, // Include only if category is selected
+        };
+
+        // Fetch data
         const { data, per_page, total } = await fetchData<User>(
           `${import.meta.env.VITE_API_BASE_URL}/api/products`,
-          { page: p, filter: `${fName}${filter}` }
+          params
         );
 
         setUsers(data);

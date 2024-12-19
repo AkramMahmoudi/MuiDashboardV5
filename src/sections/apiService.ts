@@ -11,12 +11,10 @@ interface FetchResponse<T> {
 // Reusable fetch function
 export const fetchData = async <T>(
   url: string,
-  { page, filter }: { page: number; filter: string }
+  params: Record<string, any>
 ): Promise<FetchResponse<T>> => {
   try {
-    const response = await axios.get<FetchResponse<T>>(
-      `${url}?page=${page}&name=${filter}`
-    );
+    const response = await axios.get<FetchResponse<T>>(url, { params });
     return response.data;
   } catch (error) {
     console.error('Error fetching data:', error);
