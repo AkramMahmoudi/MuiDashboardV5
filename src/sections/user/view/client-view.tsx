@@ -83,8 +83,7 @@ export function ClientView() {
     try {
       const { data, per_page, total } = await fetchData<User>(
         `${import.meta.env.VITE_API_BASE_URL}/api/clients`,
-        p,
-        fName
+        { page: p, filter: fName }
       );
 
       setUsers(data);

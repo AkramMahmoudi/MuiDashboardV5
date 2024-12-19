@@ -11,8 +11,7 @@ interface FetchResponse<T> {
 // Reusable fetch function
 export const fetchData = async <T>(
   url: string,
-  page: number = 1,
-  filter: string = ''
+  { page, filter }: { page: number; filter: string }
 ): Promise<FetchResponse<T>> => {
   try {
     const response = await axios.get<FetchResponse<T>>(

@@ -85,8 +85,7 @@ export function ProductsView() {
     try {
       const { data, per_page, total } = await fetchData<User>(
         `${import.meta.env.VITE_API_BASE_URL}/api/products`,
-        p,
-        fName
+        { page: p, filter: fName }
       );
 
       setUsers(data);
