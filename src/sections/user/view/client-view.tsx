@@ -45,6 +45,7 @@ interface User {
   montant: number;
   ancien: number;
 }
+
 // interface FetchResponse {
 //   data: User[];
 //   current_page: number;
@@ -81,9 +82,10 @@ export function ClientView() {
 
   const fetchUsers = async (p: number, fName: string) => {
     try {
+      const params = { page: p, name: fName };
       const { data, per_page, total } = await fetchData<User>(
         `${import.meta.env.VITE_API_BASE_URL}/api/clients`,
-        { page: p, filter: fName }
+        params
       );
 
       setUsers(data);
