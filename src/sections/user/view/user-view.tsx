@@ -41,9 +41,10 @@ import { emptyRows, emptyRowsv2, applyFilter, getComparator } from '../utils';
 interface User {
   id: string;
   name: string;
+  username: string;
+  password: string;
   phone: string;
-  montant: number;
-  ancien: number;
+  role: string;
 }
 
 // interface FetchResponse {
@@ -53,7 +54,7 @@ interface User {
 //   total: number;
 // }
 
-export function ClientView() {
+export function UserView() {
   const [filterName, setFilterName] = useState('');
   const [users, setUsers] = useState<User[]>([]);
   const [page, setPage] = useState(0);
@@ -63,9 +64,10 @@ export function ClientView() {
   const [formData, setFormData] = useState<User>({
     id: '',
     name: '',
+    username: '',
+    password: '',
     phone: '',
-    montant: 0,
-    ancien: 0,
+    role: '',
   });
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
@@ -84,7 +86,7 @@ export function ClientView() {
     try {
       const params = { page: p, name: fName };
       const { data, per_page, total } = await fetchData<User>(
-        `${import.meta.env.VITE_API_BASE_URL}/api/clients`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/users`,
         params
       );
 
@@ -146,9 +148,10 @@ export function ClientView() {
       setFormData({
         id: '',
         name: '',
+        username: '',
+        password: '',
         phone: '',
-        montant: 0,
-        ancien: 0,
+        role: '',
       }); // Reset form for adding
     }
     setOpenModal(true);
@@ -171,18 +174,19 @@ export function ClientView() {
     setLoading(true);
     try {
       // Convert string fields to numbers for the payload
-      const { id, name, phone, montant, ancien } = formData;
+      const { id, name, username, password, phone, role } = formData;
 
       const payload = {
         name,
+        username,
+        password,
         phone,
-        montant: Number(montant),
-        ancien: Number(ancien),
+        role,
       };
 
       const url = id
-        ? `http://192.168.1.9:3000/api/client/${id}`
-        : 'http://192.168.1.9:3000/api/client';
+        ? `http://192.168.1.9:3000/api/user/${id}`
+        : 'http://192.168.1.9:3000/api/user';
       const method = id ? 'put' : 'post';
 
       await axios({
@@ -216,7 +220,7 @@ export function ClientView() {
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
-          Clients
+          Users
         </Typography>
         <Button
           variant="contained"
@@ -224,7 +228,7 @@ export function ClientView() {
           startIcon={<Iconify icon="mingcute:add-line" />}
           onClick={() => handleOpenModal()}
         >
-          New Client
+          New User
         </Button>
       </Box>
 
@@ -247,9 +251,10 @@ export function ClientView() {
                 onSelectAllRows={handleSelectAllRows}
                 headLabel={[
                   { id: 'name', label: 'Name' },
+                  { id: 'username', label: 'username' },
+                  { id: 'password', label: 'password' },
                   { id: 'phone', label: 'phone' },
-                  { id: 'montant', label: 'montant' },
-                  { id: 'ancien', label: 'ancien' },
+                  { id: 'role', label: 'role' },
                   { id: '', label: '' },
                 ]}
               />
@@ -313,7 +318,7 @@ export function ClientView() {
                 fetchFunction: () => {
                   fetchUsers(page + 1, filterName);
                 },
-                apiEndpoint: `${import.meta.env.VITE_API_BASE_URL}/api/client`,
+                apiEndpoint: `${import.meta.env.VITE_API_BASE_URL}/api/user`,
                 closeDialog: handleCloseConfirmDialog,
               })
             }
@@ -355,23 +360,31 @@ export function ClientView() {
             />
 
             <TextField
-              label="Phone"
+              label="username"
+              name="username"
+              value={formData.username}
+              onChange={handleChange}
+              fullWidth
+            />
+            <TextField
+              label="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              fullWidth
+            />
+            <TextField
+              label="phone"
               name="phone"
               value={formData.phone}
               onChange={handleChange}
               fullWidth
+              inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}
             />
             <TextField
-              label="montant"
-              name="montant"
-              value={formData.montant}
-              onChange={handleChange}
-              fullWidth
-            />
-            <TextField
-              label="ancien"
-              name="ancien"
-              value={formData.ancien}
+              label="role"
+              name="role"
+              value={formData.role}
               onChange={handleChange}
               fullWidth
               // inputProps={{ inputMode: 'numeric', pattern: '[0-9]*' }}

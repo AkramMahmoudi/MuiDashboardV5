@@ -1,1 +1,1 @@
-export * from './client-view';
+export * from './user-view';
