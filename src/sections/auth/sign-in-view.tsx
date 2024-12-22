@@ -12,25 +12,32 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { useRouter } from 'src/routes/hooks';
 
 import { Iconify } from 'src/components/iconify';
-
+import { postData } from '../apiService';
 // ----------------------------------------------------------------------
 
 export function SignInView() {
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
+  const [inputUsername, setinputUsername] = useState('bachir12');
+  const [inputPass, setinputPass] = useState('1652994');
 
-  const handleSignIn = useCallback(() => {
-    router.push('/');
-  }, [router]);
+  const handleSignIn = () => {
+    postData('login', { username: inputUsername, password: inputPass }).then(() => {
+      router.push('/');
+    });
+  };
 
   const renderForm = (
     <Box display="flex" flexDirection="column" alignItems="flex-end">
       <TextField
+        onChange={(e) => {
+          setinputUsername(e.target.value);
+        }}
         fullWidth
-        name="email"
+        name="username"
         label="Email address"
-        defaultValue="hello@gmail.com"
+        defaultValue="bachir12"
         InputLabelProps={{ shrink: true }}
         sx={{ mb: 3 }}
       />
@@ -41,9 +48,12 @@ export function SignInView() {
 
       <TextField
         fullWidth
+        onChange={(e) => {
+          setinputPass(e.target.value);
+        }}
         name="password"
         label="Password"
-        defaultValue="@demo1234"
+        defaultValue="1652994"
         InputLabelProps={{ shrink: true }}
         type={showPassword ? 'text' : 'password'}
         InputProps={{

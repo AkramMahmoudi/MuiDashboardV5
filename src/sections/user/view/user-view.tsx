@@ -86,7 +86,7 @@ export function UserView() {
     try {
       const params = { page: p, name: fName };
       const { data, per_page, total } = await fetchData<User>(
-        `${import.meta.env.VITE_API_BASE_URL}/api/users`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/filterusers`,
         params
       );
 
@@ -185,8 +185,8 @@ export function UserView() {
       };
 
       const url = id
-        ? `http://192.168.1.9:3000/api/user/${id}`
-        : 'http://192.168.1.9:3000/api/user';
+        ? `http://192.168.1.9:3000/api/filterusers/${id}`
+        : 'http://192.168.1.9:3000/api/filterusers';
       const method = id ? 'put' : 'post';
 
       await axios({
@@ -318,7 +318,7 @@ export function UserView() {
                 fetchFunction: () => {
                   fetchUsers(page + 1, filterName);
                 },
-                apiEndpoint: `${import.meta.env.VITE_API_BASE_URL}/api/user`,
+                apiEndpoint: `${import.meta.env.VITE_API_BASE_URL}/api/filterusers`,
                 closeDialog: handleCloseConfirmDialog,
               })
             }

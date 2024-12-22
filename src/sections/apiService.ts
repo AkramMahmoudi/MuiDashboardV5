@@ -7,7 +7,10 @@ interface FetchResponse<T> {
   per_page: number;
   total: number;
 }
-
+interface PostResponse {
+  token: string;
+  [key: string]: any; // If the response may have additional properties
+}
 // Reusable fetch function
 export const fetchData = async <T>(
   url: string,
@@ -22,9 +25,7 @@ export const fetchData = async <T>(
   }
 };
 
-
 // deleteHandler.ts
-
 
 interface DeleteHandlerParams {
   idToDelete: string | null;
@@ -65,3 +66,26 @@ export const handleConfirmDelete = async ({
   }
 };
 
+export const postData = async (
+  resource: string,
+  params: Record<string, any>
+): Promise<PostResponse> => {
+  try {
+    const response = await axios.post<PostResponse>(
+      `${import.meta.env.VITE_API_BASE_URL}/api/${resource}`,
+      params
+    );
+    if (response.status === 200) {
+      const TOKEN = response.data.token;
+      localStorage.setItem('token', TOKEN);
+
+      axios.defaults.headers.common.Authorization = `Bearer ${TOKEN}`;
+    }
+
+    console.log(response.data);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    throw error;
+  }
+};

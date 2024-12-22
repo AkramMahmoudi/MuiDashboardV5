@@ -45,12 +45,7 @@ interface User {
   quantity: number;
   category_id: number; // إضافة category_id
 }
-// interface FetchResponse {
-//   data: User[];
-//   current_page: number;
-//   per_page: number;
-//   total: number;
-// }
+
 type Category = {
   id: number;
   name: string;
@@ -102,14 +97,23 @@ export function ProductsView() {
 
   const fetchCategories = async () => {
     try {
+      // Retrieve the JWT token from localStorage (or other secure storage if used)
+      // const token = localStorage.getItem('jwtToken');
+      // if (!token) {
+      //   console.error('JWT token not found. Please log in.');
+      //   setCategories([]); // Set to an empty array if the token is missing
+      //   return;
+      // }
+      // Make the API request with the Authorization header
       const response = await axios.get<ApiResponse<Category[]>>(
-        `${import.meta.env.VITE_API_BASE_URL}/api/categories`
+        `${import.meta.env.VITE_API_BASE_URL}/api/Filtercategories`
       );
 
-      console.log(response.data.data); // الوصول إلى البيانات داخل الخاصية data
+      console.log('Fetched categories:', response.data);
       setCategories(response.data.data); // ضبط القيم في الحالة
     } catch (error) {
       console.error('Error fetching categories:', error);
+      // setCategories([]);
     }
   };
 
