@@ -37,10 +37,11 @@ export function UserTableToolbar({
         display: 'flex',
         justifyContent: 'space-between',
         p: (theme) => theme.spacing(0, 1, 0, 3),
-        ...(numSelected > 0 && {
-          color: 'primary.main',
-          bgcolor: 'primary.lighter',
-        }),
+        ...(numSelected &&
+          numSelected > 0 && {
+            color: 'primary.main',
+            bgcolor: 'primary.lighter',
+          }),
       }}
     >
       {numSelected > 0 ? (
