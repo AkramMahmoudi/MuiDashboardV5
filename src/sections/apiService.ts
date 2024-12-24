@@ -2,6 +2,13 @@ import type { Dispatch, SetStateAction } from 'react';
 
 import axios from 'axios';
 
+interface ProductPayload {
+  name: string;
+  price: number;
+  sell_price: number;
+  quantity: number;
+  category_id: number;
+}
 interface FetchResponse<T> {
   data: T[];
   per_page: number;
@@ -103,4 +110,15 @@ export const putData = async (
     console.error('Error updating data:', error);
     throw error;
   }
+};
+export const createProduct = async (payload: ProductPayload) => {
+  const url = `${import.meta.env.VITE_API_BASE_URL}/api/product`;
+  const response = await axios.post(url, payload);
+  return response;
+};
+
+export const updateProduct = async (id: string, payload: ProductPayload) => {
+  const url = `${import.meta.env.VITE_API_BASE_URL}/api/product/${id}`;
+  const response = await axios.put(url, payload);
+  return response;
 };

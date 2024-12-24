@@ -1,4 +1,4 @@
-import axios from 'axios';
+// import axios from 'axios';
 import React, { useState, useEffect } from 'react';
 import {
   Dialog,
@@ -14,7 +14,7 @@ import {
   FormControl,
   SelectChangeEvent,
 } from '@mui/material';
-import { fetchData } from '../../apiService';
+import { fetchData, createProduct, updateProduct } from '../../apiService';
 
 export interface ProductFormData {
   id?: string; // Optional, since new products may not have an ID yet
@@ -64,7 +64,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
           setCategories(response.data.flat());
           console.log(response.data.flat());
-          
         } catch (error) {
           console.error('Error fetching categories:', error);
         }
@@ -100,12 +99,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         setSnackbarOpen(true);
         return;
       }
-      console.log(formData);
-      const url =
-        formData.id !== ''
-          ? `${import.meta.env.VITE_API_BASE_URL}/api/product/${formData.id}`
-          : `${import.meta.env.VITE_API_BASE_URL}/api/product`;
-      const method = formData.id ? 'put' : 'post';
+     
 
       const payload = {
         name: formData.name,
@@ -114,16 +108,25 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         quantity: formData.quantity,
         category_id: formData.category_id,
       };
-      console.log(payload);
-      const response = await axios({
-        method,
-        url,
-        data: payload,
-      });
+
+      let response;
+      if (formData.id) {
+        response = await updateProduct(formData.id, payload);
+        setSnackbarMessage('Product updated successfully!');
+      } else {
+        response = await createProduct(payload);
+        setSnackbarMessage('Product added successfully!');
+      }
+      // console.log(payload);
+      // const response = await axios({
+      //   method,
+      //   url,
+      //   data: payload,
+      // });
       console.log(response);
-      setSnackbarMessage(
-        formData.id ? 'Product updated successfully!' : 'Product added successfully!'
-      );
+      // setSnackbarMessage(
+      //   formData.id ? 'Product updated successfully!' : 'Product added successfully!'
+      // );
       setSnackbarSeverity('success');
       fetchUsers(); // Refresh the product list
       onClose();

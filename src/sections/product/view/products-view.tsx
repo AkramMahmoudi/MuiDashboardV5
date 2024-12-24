@@ -180,45 +180,6 @@ export function ProductsView() {
     setOpenModal(false);
   };
 
-  const handleSubmit = async () => {
-    setLoading(true);
-    try {
-      // Convert string fields to numbers for the payload
-      const { id, name, price, sell_price, quantity, category_id } = formData!;
-
-      const payload = {
-        name,
-        price: Number(price),
-        sell_price: Number(sell_price),
-        quantity: Number(quantity),
-        category_id: Number(category_id),
-      };
-
-      const url = id
-        ? `http://192.168.1.9:3000/api/product/${id}`
-        : 'http://192.168.1.9:3000/api/product';
-      const method = id ? 'put' : 'post';
-
-      await axios({
-        method,
-        url,
-        data: payload,
-      });
-      setSnackbarMessage(id ? 'Product updated successfully!' : 'Product added successfully!');
-      setSnackbarSeverity('success');
-
-      handleCloseModal();
-      fetchUsers(page + 1, filterName);
-    } catch (error: any) {
-      // console.error('Error saving product:', error);
-      setSnackbarMessage(error.response?.data);
-      setSnackbarSeverity('error');
-    } finally {
-      setLoading(false);
-      setSnackbarOpen(true); // Show the snackbar
-    }
-  };
-
   // const notFound = !users.length && !!filterName;
 
   return (
