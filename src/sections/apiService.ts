@@ -89,9 +89,15 @@ export const postData = async (
     throw error;
   }
 };
-export const putData = async (resource: string, params: Record<string, any>): Promise<PostResponse> => {
+export const putData = async (
+  resource: string,
+  params: Record<string, any>
+): Promise<PostResponse> => {
   try {
-    const response = await axios.put<PostResponse>(`${import.meta.env.VITE_API_BASE_URL}/api/${resource}`, params);
+    const response = await axios.put<PostResponse>(
+      `${import.meta.env.VITE_API_BASE_URL}/api/${resource}`,
+      params
+    );
     return response.data;
   } catch (error) {
     console.error('Error updating data:', error);

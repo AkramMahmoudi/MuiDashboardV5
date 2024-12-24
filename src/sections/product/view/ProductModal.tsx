@@ -122,8 +122,10 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       fetchUsers(); // Refresh the product list
       onClose();
     } catch (error: any) {
-      console.log(error);
-      setSnackbarMessage('Failed to save product.');
+      console.log(error.response.data);
+      const errorArr = error.response.data;
+      errorArr.map((err: string) => setSnackbarMessage(err));
+      // setSnackbarMessage('error');
       setSnackbarSeverity('error');
     } finally {
       setSnackbarOpen(true);
