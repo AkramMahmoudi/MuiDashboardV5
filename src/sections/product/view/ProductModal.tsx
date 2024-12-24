@@ -14,7 +14,7 @@ import {
   FormControl,
   SelectChangeEvent,
 } from '@mui/material';
-import { postData, putData } from '../../apiService';
+import { fetchData } from '../../apiService';
 
 export interface ProductFormData {
   id?: string; // Optional, since new products may not have an ID yet
@@ -24,7 +24,10 @@ export interface ProductFormData {
   quantity: number;
   category_id: number;
 }
-
+interface Category {
+  id: number;
+  name: string;
+}
 interface ProductModalProps {
   open: boolean;
   onClose: () => void;
@@ -47,25 +50,28 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   setSnackbarOpen,
 }) => {
   const [loading, setLoading] = useState(false);
-  const [categories, setCategories] = useState<any[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   // Fetch categories dynamically (replace with actual API if necessary)
   useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        // Placeholder for category fetching logic
-        const fetchedCategories = [
-          { id: 1, name: 'Category 1' },
-          { id: 2, name: 'Category 2' },
-          { id: 3, name: 'Category 3' },
-        ];
-        setCategories(fetchedCategories);
-      } catch (error) {
-        console.error('Failed to fetch categories:', error);
-      }
-    };
-    fetchCategories();
-  }, []);
+    if (open) {
+      const fetchCategories = async () => {
+        try {
+          const response = await fetchData<Category[]>(
+            `${import.meta.env.VITE_API_BASE_URL}/api/categories`,
+            {}
+          );
+
+          setCategories(response.data.flat());
+          console.log(response.data.flat());
+          
+        } catch (error) {
+          console.error('Error fetching categories:', error);
+        }
+      };
+      fetchCategories();
+    }
+  }, [open]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<number>
@@ -108,7 +114,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         quantity: formData.quantity,
         category_id: formData.category_id,
       };
-
+      console.log(payload);
       const response = await axios({
         method,
         url,
@@ -122,11 +128,16 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       fetchUsers(); // Refresh the product list
       onClose();
     } catch (error: any) {
-      console.log(error.response.data);
+      console.log(error.response.data.message);
       const errorArr = error.response.data;
-      errorArr.map((err: string) => setSnackbarMessage(err));
-      // setSnackbarMessage('error');
       setSnackbarSeverity('error');
+
+      if (error.response.data.message === 'invalid token') {
+        setSnackbarMessage(error.response.data.message);
+      } else {
+        errorArr.map((err: string) => setSnackbarMessage(err));
+      }
+      // setSnackbarMessage('error');
     } finally {
       setSnackbarOpen(true);
       setLoading(false);
