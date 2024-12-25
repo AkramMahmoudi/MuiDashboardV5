@@ -73,6 +73,20 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     }
   }, [open]);
 
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        setFormData((prevFormData) => {
+          if (!prevFormData) return null;
+          return { ...prevFormData, image: reader.result as string };
+        });
+      };
+      reader.readAsDataURL(file); // Convert image to Base64
+    }
+  };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<number>
   ) => {
@@ -195,13 +209,27 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           value={formData?.role || ''}
           onChange={handleChange}
         />
-        <TextField
+        {/* <FormControl fullWidth margin="dense">
+          <InputLabel>Role</InputLabel>
+          <Select name="role" value={formData?.role || ''} onChange={handleChange}>
+            <MenuItem value="admin">Admin</MenuItem>
+            <MenuItem value="user">User</MenuItem>
+          </Select>
+        </FormControl> */}
+        {/* <TextField
           fullWidth
           margin="dense"
           label="image"
           name="image"
           value={formData?.image || ''}
           onChange={handleChange}
+        /> */}
+        <TextField
+          fullWidth
+          margin="dense"
+          type="file"
+          InputLabelProps={{ shrink: true }}
+          onChange={handleImageChange}
         />
         {/* <FormControl fullWidth margin="dense">
           <InputLabel>Category</InputLabel>
