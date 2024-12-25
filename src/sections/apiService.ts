@@ -9,14 +9,23 @@ interface ProductPayload {
   quantity: number;
   category_id: number;
 }
+
+interface UserPayload {
+  name: string;
+  username: string;
+  password: string;
+  phone: string;
+  role: string;
+  image: string | null;
+}
 interface FetchResponse<T> {
   data: T[];
+  current_page: number;
   per_page: number;
   total: number;
 }
 interface PostResponse {
-  token: string;
-  [key: string]: any; // If the response may have additional properties
+  [key: string]: any;
 }
 // Reusable fetch function
 export const fetchData = async <T>(
@@ -83,13 +92,13 @@ export const postData = async (
       params
     );
     if (response.status === 200) {
-      const TOKEN = response.data.token;
+      console.log(response.data.data);
+      const TOKEN = response.data.data;
       localStorage.setItem('token', TOKEN);
 
       axios.defaults.headers.common.Authorization = `Bearer ${TOKEN}`;
     }
 
-    console.log(response.data);
     return response.data;
   } catch (error) {
     console.error('Error fetching data:', error);
@@ -119,6 +128,18 @@ export const createProduct = async (payload: ProductPayload) => {
 
 export const updateProduct = async (id: string, payload: ProductPayload) => {
   const url = `${import.meta.env.VITE_API_BASE_URL}/api/product/${id}`;
+  const response = await axios.put(url, payload);
+  return response;
+};
+
+export const createUser = async (payload: UserPayload) => {
+  const url = `${import.meta.env.VITE_API_BASE_URL}/api/user`;
+  const response = await axios.post(url, payload);
+  return response;
+};
+
+export const updateUser = async (id: string, payload: UserPayload) => {
+  const url = `${import.meta.env.VITE_API_BASE_URL}/api/user/${id}`;
   const response = await axios.put(url, payload);
   return response;
 };

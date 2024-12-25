@@ -19,8 +19,8 @@ export function SignInView() {
   const router = useRouter();
 
   const [showPassword, setShowPassword] = useState(false);
-  const [inputUsername, setinputUsername] = useState('bachir12');
-  const [inputPass, setinputPass] = useState('1652994');
+  const [inputUsername, setinputUsername] = useState('test01');
+  const [inputPass, setinputPass] = useState('test');
 
   const handleSignIn = () => {
     postData('login', { username: inputUsername, password: inputPass }).then(() => {
@@ -36,8 +36,8 @@ export function SignInView() {
         }}
         fullWidth
         name="username"
-        label="Email address"
-        defaultValue="bachir12"
+        label="UserName"
+        defaultValue="test01"
         InputLabelProps={{ shrink: true }}
         sx={{ mb: 3 }}
       />
@@ -53,7 +53,7 @@ export function SignInView() {
         }}
         name="password"
         label="Password"
-        defaultValue="1652994"
+        defaultValue="test"
         InputLabelProps={{ shrink: true }}
         type={showPassword ? 'text' : 'password'}
         InputProps={{

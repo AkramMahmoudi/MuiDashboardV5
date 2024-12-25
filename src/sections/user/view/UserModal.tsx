@@ -14,15 +14,16 @@ import {
   FormControl,
   SelectChangeEvent,
 } from '@mui/material';
-import { fetchData, createProduct, updateProduct } from '../../apiService';
+import { fetchData, createProduct, updateProduct, createUser, updateUser } from '../../apiService';
 
 export interface ProductFormData {
-  id?: string; // Optional, since new products may not have an ID yet
+  id?: string;
   name: string;
-  price: number;
-  sell_price: number;
-  quantity: number;
-  category_id: number;
+  username: string;
+  password: string;
+  phone: string;
+  role: string;
+  image: string | null;
 }
 interface Category {
   id: number;
@@ -102,19 +103,20 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
       const payload = {
         name: formData.name,
-        price: formData.price,
-        sell_price: formData.sell_price,
-        quantity: formData.quantity,
-        category_id: formData.category_id,
+        username: formData.username,
+        password: formData.password,
+        phone: formData.phone,
+        role: formData.role,
+        image: formData.image === '' ? null : formData.image,
       };
 
       let response;
       if (!formData.id) {
-        response = await createProduct(payload);
-        setSnackbarMessage('Product added successfully!');
+        response = await createUser(payload);
+        setSnackbarMessage('User added successfully!');
       } else {
-        response = await updateProduct(formData.id, payload);
-        setSnackbarMessage('Product updated successfully!');
+        response = await updateUser(formData.id, payload);
+        setSnackbarMessage('User updated successfully!');
       }
       // console.log(payload);
       // const response = await axios({
@@ -150,7 +152,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>{formData?.id ? 'Edit Product' : 'New Product'}</DialogTitle>
+      <DialogTitle>{formData?.id ? 'Edit User' : 'New User'}</DialogTitle>
       <DialogContent>
         <TextField
           fullWidth
@@ -163,31 +165,45 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         <TextField
           fullWidth
           margin="dense"
-          label="Price"
-          name="price"
-          type="number"
-          value={formData?.price || ''}
+          label="username"
+          name="username"
+          value={formData?.username || ''}
           onChange={handleChange}
         />
         <TextField
           fullWidth
           margin="dense"
-          label="Sell Price"
-          name="sell_price"
-          type="number"
-          value={formData?.sell_price || ''}
+          label="password"
+          name="password"
+          value={formData?.password || ''}
           onChange={handleChange}
         />
         <TextField
           fullWidth
           margin="dense"
-          label="Quantity"
-          name="quantity"
+          label="phone"
+          name="phone"
           type="number"
-          value={formData?.quantity || ''}
+          value={formData?.phone || ''}
           onChange={handleChange}
         />
-        <FormControl fullWidth margin="dense">
+        <TextField
+          fullWidth
+          margin="dense"
+          label="role"
+          name="role"
+          value={formData?.role || ''}
+          onChange={handleChange}
+        />
+        <TextField
+          fullWidth
+          margin="dense"
+          label="image"
+          name="image"
+          value={formData?.image || ''}
+          onChange={handleChange}
+        />
+        {/* <FormControl fullWidth margin="dense">
           <InputLabel>Category</InputLabel>
           <Select name="category_id" value={formData?.category_id || ''} onChange={handleChange}>
             <MenuItem value="">Select a category</MenuItem>
@@ -197,7 +213,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               </MenuItem>
             ))}
           </Select>
-        </FormControl>
+        </FormControl> */}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} variant="outlined">
