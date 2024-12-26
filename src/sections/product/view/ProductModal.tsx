@@ -14,7 +14,7 @@ import {
   FormControl,
   SelectChangeEvent,
 } from '@mui/material';
-import { fetchData, createProduct, updateProduct } from '../../apiService';
+import { fetchData, createEntity, updateEntity } from '../../apiService';
 
 export interface ProductFormData {
   id?: string; // Optional, since new products may not have an ID yet
@@ -110,10 +110,10 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
       let response;
       if (!formData.id) {
-        response = await createProduct(payload);
+        response = await createEntity('product', payload);
         setSnackbarMessage('Product added successfully!');
       } else {
-        response = await updateProduct(formData.id, payload);
+        response = await updateEntity('product', formData.id, payload);
         setSnackbarMessage('Product updated successfully!');
       }
       // console.log(payload);

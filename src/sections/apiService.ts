@@ -120,26 +120,14 @@ export const putData = async (
     throw error;
   }
 };
-export const createProduct = async (payload: ProductPayload) => {
-  const url = `${import.meta.env.VITE_API_BASE_URL}/api/product`;
+export const createEntity = async <T>(entity: string, payload: T) => {
+  const url = `${import.meta.env.VITE_API_BASE_URL}/api/${entity}`;
   const response = await axios.post(url, payload);
   return response;
 };
 
-export const updateProduct = async (id: string, payload: ProductPayload) => {
-  const url = `${import.meta.env.VITE_API_BASE_URL}/api/product/${id}`;
-  const response = await axios.put(url, payload);
-  return response;
-};
-
-export const createUser = async (payload: UserPayload) => {
-  const url = `${import.meta.env.VITE_API_BASE_URL}/api/user`;
-  const response = await axios.post(url, payload);
-  return response;
-};
-
-export const updateUser = async (id: string, payload: UserPayload) => {
-  const url = `${import.meta.env.VITE_API_BASE_URL}/api/user/${id}`;
+export const updateEntity = async <T>(entity: string, id: string, payload: T) => {
+  const url = `${import.meta.env.VITE_API_BASE_URL}/api/${entity}/${id}`;
   const response = await axios.put(url, payload);
   return response;
 };
