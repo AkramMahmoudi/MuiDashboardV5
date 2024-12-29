@@ -38,7 +38,7 @@ interface User {
   password: string;
   phone: string;
   role: string;
-  image: string | null;
+  image: File | null;
 }
 
 // type Category = {
@@ -171,7 +171,7 @@ export function UserView() {
         password: '',
         phone: '',
         role: '',
-        image: '',
+        image: null,
       });
     }
     setOpenModal(true);

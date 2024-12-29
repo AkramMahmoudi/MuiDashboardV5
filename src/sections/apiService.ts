@@ -34,7 +34,12 @@ export const fetchData = async <T>(
 ): Promise<FetchResponse<T>> => {
   try {
     const response = await axios.get<FetchResponse<T>>(url, { params });
-    return response.data;
+    if (response.status === 200) {
+      return response.data;
+    }
+    throw new Error(`Unexpected status code: ${response.status}`);
+
+    // return response.data;
   } catch (error) {
     console.error('Error fetching data:', error);
     throw error;
@@ -120,14 +125,33 @@ export const putData = async (
     throw error;
   }
 };
-export const createEntity = async <T>(entity: string, payload: T) => {
+// for base64
+// export const createEntity = async <T>(entity: string, payload: T) => {
+//   const url = `${import.meta.env.VITE_API_BASE_URL}/api/${entity}`;
+//   const response = await axios.post(url, payload);
+//   return response;
+// };
+
+// export const updateEntity = async <T>(entity: string, id: string, payload: T) => {
+//   const url = `${import.meta.env.VITE_API_BASE_URL}/api/${entity}/${id}`;
+//   const response = await axios.put(url, payload);
+//   return response;
+// };
+
+// for multipart type
+
+export const createEntity = async <T>(entity: string, payload: T | FormData) => {
   const url = `${import.meta.env.VITE_API_BASE_URL}/api/${entity}`;
-  const response = await axios.post(url, payload);
+  const config =
+    payload instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+  const response = await axios.post(url, payload, config);
   return response;
 };
 
-export const updateEntity = async <T>(entity: string, id: string, payload: T) => {
+export const updateEntity = async <T>(entity: string, id: string, payload: T | FormData) => {
   const url = `${import.meta.env.VITE_API_BASE_URL}/api/${entity}/${id}`;
-  const response = await axios.put(url, payload);
+  const config =
+    payload instanceof FormData ? { headers: { 'Content-Type': 'multipart/form-data' } } : {};
+  const response = await axios.put(url, payload, config);
   return response;
 };

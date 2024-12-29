@@ -107,7 +107,7 @@ export function ProductsView() {
         };
 
         const { data, per_page, total } = await fetchData<User>(
-          `${import.meta.env.VITE_API_BASE_URL}/api/products`,
+          `${import.meta.env.VITE_API_BASE_URL}/api/FilterProducts`,
           params
         );
 

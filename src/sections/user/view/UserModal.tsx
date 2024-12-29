@@ -23,7 +23,7 @@ export interface ProductFormData {
   password: string;
   phone: string;
   role: string;
-  image: string | null;
+  image: File | null;
 }
 interface Category {
   id: number;
@@ -72,18 +72,27 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       fetchCategories();
     }
   }, [open]);
-
-  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  // handleimage for base64
+  // const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     const reader = new FileReader();
+  //     reader.onload = () => {
+  //       setFormData((prevFormData) => {
+  //         if (!prevFormData) return null;
+  //         return { ...prevFormData, image: reader.result as string };
+  //       });
+  //     };
+  //     reader.readAsDataURL(file); // Convert image to Base64
+  //   }
+  // };
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setFormData((prevFormData) => {
-          if (!prevFormData) return null;
-          return { ...prevFormData, image: reader.result as string };
-        });
-      };
-      reader.readAsDataURL(file); // Convert image to Base64
+      setFormData((prevFormData) => {
+        if (!prevFormData) return null;
+        return { ...prevFormData, image: file };
+      });
     }
   };
 
@@ -115,33 +124,46 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         return;
       }
 
-      const payload = {
-        name: formData.name,
-        username: formData.username,
-        password: formData.password,
-        phone: formData.phone,
-        role: formData.role,
-        image: formData.image === '' ? null : formData.image,
-      };
+      // const payload = {
+      //   name: formData.name,
+      //   username: formData.username,
+      //   password: formData.password,
+      //   phone: formData.phone,
+      //   role: formData.role,
+      //   image: formData.image === '' ? null : formData.image,
+      // };
+      // Construct a FormData object
+      const formDataToSend = new FormData();
+      formDataToSend.append('name', formData.name);
+      formDataToSend.append('username', formData.username);
+      formDataToSend.append('password', formData.password);
+      formDataToSend.append('phone', formData.phone);
+      formDataToSend.append('role', formData.role);
 
+      // Append image only if it's not null
+      if (formData.image instanceof File) {
+        formDataToSend.append('image', formData.image);
+      }
       let response;
+      // if (!formData.id) {
+      //   response = await createEntity('user', payload);
+      //   setSnackbarMessage('User added successfully!');
+      // } else {
+      //   response = await updateEntity('user', formData.id, payload);
+      //   setSnackbarMessage('User updated successfully!');
+      // }
       if (!formData.id) {
-        response = await createEntity('user', payload);
+        // For creating a new user
+        response = await createEntity('user', formDataToSend);
         setSnackbarMessage('User added successfully!');
       } else {
-        response = await updateEntity('user', formData.id, payload);
+        // For updating an existing user
+        response = await updateEntity('user', formData.id, formDataToSend);
         setSnackbarMessage('User updated successfully!');
       }
-      // console.log(payload);
-      // const response = await axios({
-      //   method,
-      //   url,
-      //   data: payload,
-      // });
+
       console.log(response);
-      // setSnackbarMessage(
-      //   formData.id ? 'Product updated successfully!' : 'Product added successfully!'
-      // );
+
       setSnackbarSeverity('success');
       fetchUsers(); // Refresh the product list
       onClose();
