@@ -135,7 +135,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       // const errorArr = error.response.data;
       setSnackbarSeverity('error');
 
-      if (error.response?.data?.message === 'invalid token') {
+      if (error.response?.data?.message) {
         setSnackbarMessage(error.response?.data?.message);
       } else {
         // errorArr.map((err: string) => setSnackbarMessage(err));
