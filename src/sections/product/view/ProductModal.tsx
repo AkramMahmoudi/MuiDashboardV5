@@ -23,6 +23,8 @@ export interface ProductFormData {
   sell_price: number;
   quantity: number;
   category_id: number;
+  image: File | null;
+  barcode: { name: string }[];
 }
 interface Category {
   id: number;
@@ -63,7 +65,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           );
 
           setCategories(response.data.flat());
-          console.log(response.data.flat());
+          // console.log(response.data.flat());
         } catch (error) {
           console.error('Error fetching categories:', error);
         }
@@ -72,22 +74,56 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     }
   }, [open]);
 
+  // const handleChange = (
+  //   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<number>
+  // ) => {
+  //   const { name, value } = e.target as { name: string; value: unknown };
+
+  //   setFormData((prevFormData) => {
+  //     if (!prevFormData) return null;
+
+  //     return {
+  //       ...prevFormData,
+  //       [name]:
+  //         name === 'category_id' || name === 'price' || name === 'sell_price' || name === 'quantity'
+  //           ? Number(value)
+  //           : value, // Convert numeric fields
+  //     };
+  //   });
+  // };
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setFormData((prevFormData) => {
+        if (!prevFormData) return null;
+        return { ...prevFormData, image: file };
+      });
+    }
+  };
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<number>
   ) => {
     const { name, value } = e.target as { name: string; value: unknown };
 
-    setFormData((prevFormData) => {
-      if (!prevFormData) return null;
-
-      return {
-        ...prevFormData,
-        [name]:
-          name === 'category_id' || name === 'price' || name === 'sell_price' || name === 'quantity'
-            ? Number(value)
-            : value, // Convert numeric fields
-      };
-    });
+    if (name === 'image') {
+      const file = (e.target as HTMLInputElement).files?.[0] || null; // Handle file input
+      setFormData((prevFormData) => (prevFormData ? { ...prevFormData, image: file } : null));
+    } else {
+      setFormData((prevFormData) =>
+        prevFormData
+          ? {
+              ...prevFormData,
+              [name]:
+                name === 'category_id' ||
+                name === 'price' ||
+                name === 'sell_price' ||
+                name === 'quantity'
+                  ? Number(value)
+                  : value,
+            }
+          : null
+      );
+    }
   };
 
   const handleSave = async () => {
@@ -100,13 +136,28 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         return;
       }
 
-      const payload = {
-        name: formData.name,
-        price: formData.price,
-        sell_price: formData.sell_price,
-        quantity: formData.quantity,
-        category_id: formData.category_id,
-      };
+      // const payload = {
+      //   name: formData.name,
+      //   price: formData.price,
+      //   sell_price: formData.sell_price,
+      //   quantity: formData.quantity,
+      //   category_id: formData.category_id,
+      // };
+
+      const payload = new FormData();
+      payload.append('name', formData.name);
+      payload.append('price', String(formData.price));
+      payload.append('sell_price', String(formData.sell_price));
+      payload.append('quantity', String(formData.quantity));
+      payload.append('category_id', String(formData.category_id));
+      console.log(JSON.stringify(formData.barcode));
+      payload.append('barcode', JSON.stringify(formData.barcode));
+
+      if (formData.image) {
+        payload.append('image', formData.image); // Append only if the image is not null
+      } else {
+        payload.append('image', 'null'); // Append an empty string to maintain the key
+      }
 
       let response;
       if (!formData.id) {
@@ -122,7 +173,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       //   url,
       //   data: payload,
       // });
-      console.log(response);
+      // console.log(response);
       // setSnackbarMessage(
       //   formData.id ? 'Product updated successfully!' : 'Product added successfully!'
       // );
@@ -198,6 +249,35 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             ))}
           </Select>
         </FormControl>
+        <TextField
+          fullWidth
+          margin="dense"
+          label="Barcode"
+          name="barcode"
+          value={formData?.barcode?.map((barcodeObj) => barcodeObj.name).join(', ') || ''} // Join the array into a comma-separated string
+          onChange={(e) => {
+            const barcodes = e.target.value.split(',').map((item) => ({ name: item.trim() })); // Split and trim
+           
+            console.log(barcodes);
+            setFormData((prevFormData) =>
+              prevFormData ? { ...prevFormData, barcode: barcodes } : null
+            );
+          }}
+          // onChange={(e) => {
+          //   const barcodes = e.target.value.split(',').map((item) => ({ name: item.trim() })); // Create array of objects with "name" keys
+
+          //   setFormData((prevFormData) =>
+          //     prevFormData ? { ...prevFormData, barcode: barcodes } : null
+          //   );
+          // }}
+        />
+        <TextField
+          fullWidth
+          margin="dense"
+          type="file"
+          InputLabelProps={{ shrink: true }}
+          onChange={handleImageChange}
+        />
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} variant="outlined">

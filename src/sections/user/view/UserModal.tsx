@@ -113,6 +113,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     });
   };
 
+  
+
   const handleSave = async () => {
     setLoading(true);
     try {

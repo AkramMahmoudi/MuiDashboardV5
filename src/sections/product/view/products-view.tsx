@@ -37,7 +37,9 @@ interface User {
   price: number;
   sell_price: number;
   quantity: number;
-  category_id: number; // إضافة category_id
+  category_id: number;
+  image: File | null;
+  barcode: { name: string }[];
 }
 
 type Category = {
@@ -156,12 +158,13 @@ export function ProductsView() {
   };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFilterName(event.target.value);
+    setFilterName(event.target.value.trim());
     setPage(0);
   };
 
   const handleOpenModal = (product: User | null = null) => {
     if (product) {
+      // console.log(product);
       setFormData(product);
     } else {
       setFormData({
@@ -171,6 +174,8 @@ export function ProductsView() {
         sell_price: 0,
         quantity: 0,
         category_id: 0,
+        image: null,
+        barcode: [],
       });
     }
     setOpenModal(true);
