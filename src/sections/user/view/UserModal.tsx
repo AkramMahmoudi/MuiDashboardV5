@@ -64,7 +64,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           );
 
           setCategories(response.data.flat());
-          console.log(response.data.flat());
         } catch (error) {
           console.error('Error fetching categories:', error);
         }
@@ -123,7 +122,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         setSnackbarOpen(true);
         return;
       }
-
+      // base 64
       // const payload = {
       //   name: formData.name,
       //   username: formData.username,
@@ -139,12 +138,14 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       formDataToSend.append('password', formData.password);
       formDataToSend.append('phone', formData.phone);
       formDataToSend.append('role', formData.role);
-
-      // Append image only if it's not null
-      if (formData.image instanceof File) {
-        formDataToSend.append('image', formData.image);
+      if (formData.image) {
+        formDataToSend.append('image', formData.image); // Append only if the image is not null
+      } else {
+        formDataToSend.append('image', 'null'); // Append an empty string to maintain the key
       }
+
       let response;
+      // base64
       // if (!formData.id) {
       //   response = await createEntity('user', payload);
       //   setSnackbarMessage('User added successfully!');
@@ -162,18 +163,15 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         setSnackbarMessage('User updated successfully!');
       }
 
-      console.log(response);
-
       setSnackbarSeverity('success');
       fetchUsers(); // Refresh the product list
       onClose();
     } catch (error: any) {
-      console.log(error.response.data.message);
       const errorArr = error.response?.data || [];
       // const errorArr = error.response.data;
       setSnackbarSeverity('error');
 
-      if (error.response?.data?.message === 'invalid token') {
+      if (error.response?.data?.message) {
         setSnackbarMessage(error.response?.data?.message);
       } else {
         // errorArr.map((err: string) => setSnackbarMessage(err));
