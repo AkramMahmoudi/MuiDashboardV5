@@ -150,9 +150,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       payload.append('sell_price', String(formData.sell_price));
       payload.append('quantity', String(formData.quantity));
       payload.append('category_id', String(formData.category_id));
-      console.log(JSON.stringify(formData.barcode));
-      payload.append('barcode', JSON.stringify(formData.barcode));
-
+      // console.log(formData.barcode.map((code) => code.name));
+      // because backend accept simple array of barcodes so i convert to array without key
+      const convBarcode = formData.barcode.map((code) => code.name);
+      payload.append('barcode', JSON.stringify(convBarcode));
+      // console.log(JSON.stringify(convBarcode));
       if (formData.image) {
         payload.append('image', formData.image); // Append only if the image is not null
       } else {
@@ -257,7 +259,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           value={formData?.barcode?.map((barcodeObj) => barcodeObj.name).join(', ') || ''} // Join the array into a comma-separated string
           onChange={(e) => {
             const barcodes = e.target.value.split(',').map((item) => ({ name: item.trim() })); // Split and trim
-           
+
             console.log(barcodes);
             setFormData((prevFormData) =>
               prevFormData ? { ...prevFormData, barcode: barcodes } : null
