@@ -189,6 +189,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
       let response;
       if (!formData.id) {
+        const defaultImageResponse = await fetch('/DPI.jpg'); // Adjust path based on your public folder
+        const defaultImageBlob = await defaultImageResponse.blob();
+        const defaultImageFile = new File([defaultImageBlob], 'DPI.jpg', { type: 'image/jpg' });
+        console.log(defaultImageFile);
+        payload.set('image', defaultImageFile); // Replace the existing value
         response = await createEntity('product', payload);
         setSnackbarMessage('Product added successfully!');
       } else {
@@ -286,7 +291,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           onChange={(e) => {
             const barcodes = e.target.value.split(',').map((item) => ({ name: item.trim() })); // Split and trim
 
-            console.log(barcodes);
+            // console.log(barcodes);
             setFormData((prevFormData) =>
               prevFormData ? { ...prevFormData, barcode: barcodes } : null
             );

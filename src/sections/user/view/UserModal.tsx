@@ -160,7 +160,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       //   setSnackbarMessage('User updated successfully!');
       // }
       if (!formData.id) {
-        // For creating a new user
+        const defaultImageResponse = await fetch('/DPI.jpg'); // Adjust path based on your public folder
+        const defaultImageBlob = await defaultImageResponse.blob();
+        const defaultImageFile = new File([defaultImageBlob], 'DPI.jpg', { type: 'image/jpg' });
+        console.log(defaultImageFile);
+        formDataToSend.set('image', defaultImageFile); // Replace the existing value
         response = await createEntity('user', formDataToSend);
         setSnackbarMessage('User added successfully!');
       } else {
