@@ -53,7 +53,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
-
   // Fetch categories dynamically (replace with actual API if necessary)
   useEffect(() => {
     if (open) {
@@ -91,39 +90,65 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   //     };
   //   });
   // };
+  // const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     setFormData((prevFormData) => {
+  //       if (!prevFormData) return null;
+  //       return { ...prevFormData, image: file };
+  //     });
+  //   }
+  // };
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFormData((prevFormData) => {
-        if (!prevFormData) return null;
-        return { ...prevFormData, image: file };
-      });
-    }
+    const file = e.target.files?.[0] !== undefined ? e.target.files?.[0] : null;
+    // console.log(file);
+    setFormData((prevFormData) => (prevFormData ? { ...prevFormData, image: file } : null));
   };
+
+  // const handleChange = (
+  //   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<number>
+  // ) => {
+  //   const { name, value } = e.target as { name: string; value: unknown };
+
+  //   if (name === 'image') {
+  //     const file = (e.target as HTMLInputElement).files?.[0] || null; // Handle file input
+  //     setFormData((prevFormData) => (prevFormData ? { ...prevFormData, image: file } : null));
+  //   } else {
+  //     setFormData((prevFormData) =>
+  //       prevFormData
+  //         ? {
+  //             ...prevFormData,
+  //             [name]:
+  //               name === 'category_id' ||
+  //               name === 'price' ||
+  //               name === 'sell_price' ||
+  //               name === 'quantity'
+  //                 ? Number(value)
+  //                 : value,
+  //           }
+  //         : null
+  //     );
+  //   }
+  // };
+
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<number>
   ) => {
     const { name, value } = e.target as { name: string; value: unknown };
-
-    if (name === 'image') {
-      const file = (e.target as HTMLInputElement).files?.[0] || null; // Handle file input
-      setFormData((prevFormData) => (prevFormData ? { ...prevFormData, image: file } : null));
-    } else {
-      setFormData((prevFormData) =>
-        prevFormData
-          ? {
-              ...prevFormData,
-              [name]:
-                name === 'category_id' ||
-                name === 'price' ||
-                name === 'sell_price' ||
-                name === 'quantity'
-                  ? Number(value)
-                  : value,
-            }
-          : null
-      );
-    }
+    setFormData((prevFormData) =>
+      prevFormData
+        ? {
+            ...prevFormData,
+            [name]:
+              name === 'category_id' ||
+              name === 'price' ||
+              name === 'sell_price' ||
+              name === 'quantity'
+                ? Number(value)
+                : value,
+          }
+        : null
+    );
   };
 
   const handleSave = async () => {
@@ -155,10 +180,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       const convBarcode = formData.barcode.map((code) => code.name);
       payload.append('barcode', JSON.stringify(convBarcode));
       // console.log(JSON.stringify(convBarcode));
-      if (formData.image) {
-        payload.append('image', formData.image); // Append only if the image is not null
+      console.log(formData.image instanceof File);
+      if (formData.image instanceof File) {
+        payload.append('image', formData.image);
       } else {
-        payload.append('image', 'null'); // Append an empty string to maintain the key
+        payload.append('image', 'null');
       }
 
       let response;

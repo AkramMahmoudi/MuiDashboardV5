@@ -85,14 +85,20 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   //     reader.readAsDataURL(file); // Convert image to Base64
   //   }
   // };
+  // const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  //   const file = e.target.files?.[0];
+  //   if (file) {
+  //     setFormData((prevFormData) => {
+  //       if (!prevFormData) return null;
+  //       return { ...prevFormData, image: file };
+  //     });
+  //   }
+  // };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      setFormData((prevFormData) => {
-        if (!prevFormData) return null;
-        return { ...prevFormData, image: file };
-      });
-    }
+    const file = e.target.files?.[0] !== undefined ? e.target.files?.[0] : null;
+    // console.log(file);
+    setFormData((prevFormData) => (prevFormData ? { ...prevFormData, image: file } : null));
   };
 
   const handleChange = (
@@ -112,8 +118,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       };
     });
   };
-
-  
 
   const handleSave = async () => {
     setLoading(true);
@@ -140,10 +144,10 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       formDataToSend.append('password', formData.password);
       formDataToSend.append('phone', formData.phone);
       formDataToSend.append('role', formData.role);
-      if (formData.image) {
-        formDataToSend.append('image', formData.image); // Append only if the image is not null
+      if (formData.image instanceof File) {
+        formDataToSend.append('image', formData.image);
       } else {
-        formDataToSend.append('image', 'null'); // Append an empty string to maintain the key
+        formDataToSend.append('image', 'null');
       }
 
       let response;
