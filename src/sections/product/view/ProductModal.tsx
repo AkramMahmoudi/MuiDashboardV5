@@ -1,5 +1,7 @@
 // import axios from 'axios';
+import * as Yup from 'yup';
 import React, { useState, useEffect } from 'react';
+
 import {
   Dialog,
   DialogTitle,
@@ -14,6 +16,8 @@ import {
   FormControl,
   SelectChangeEvent,
 } from '@mui/material';
+
+import { productValidationSchema } from '../../validation';
 import { fetchData, createEntity, updateEntity } from '../../apiService';
 
 export interface ProductFormData {
@@ -53,6 +57,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+
   // Fetch categories dynamically (replace with actual API if necessary)
   useEffect(() => {
     if (open) {
@@ -73,63 +79,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({
     }
   }, [open]);
 
-  // const handleChange = (
-  //   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<number>
-  // ) => {
-  //   const { name, value } = e.target as { name: string; value: unknown };
-
-  //   setFormData((prevFormData) => {
-  //     if (!prevFormData) return null;
-
-  //     return {
-  //       ...prevFormData,
-  //       [name]:
-  //         name === 'category_id' || name === 'price' || name === 'sell_price' || name === 'quantity'
-  //           ? Number(value)
-  //           : value, // Convert numeric fields
-  //     };
-  //   });
-  // };
-  // const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (file) {
-  //     setFormData((prevFormData) => {
-  //       if (!prevFormData) return null;
-  //       return { ...prevFormData, image: file };
-  //     });
-  //   }
-  // };
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] !== undefined ? e.target.files?.[0] : null;
     // console.log(file);
     setFormData((prevFormData) => (prevFormData ? { ...prevFormData, image: file } : null));
   };
-
-  // const handleChange = (
-  //   e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<number>
-  // ) => {
-  //   const { name, value } = e.target as { name: string; value: unknown };
-
-  //   if (name === 'image') {
-  //     const file = (e.target as HTMLInputElement).files?.[0] || null; // Handle file input
-  //     setFormData((prevFormData) => (prevFormData ? { ...prevFormData, image: file } : null));
-  //   } else {
-  //     setFormData((prevFormData) =>
-  //       prevFormData
-  //         ? {
-  //             ...prevFormData,
-  //             [name]:
-  //               name === 'category_id' ||
-  //               name === 'price' ||
-  //               name === 'sell_price' ||
-  //               name === 'quantity'
-  //                 ? Number(value)
-  //                 : value,
-  //           }
-  //         : null
-  //     );
-  //   }
-  // };
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement> | SelectChangeEvent<number>
@@ -160,14 +114,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         setSnackbarOpen(true);
         return;
       }
-
-      // const payload = {
-      //   name: formData.name,
-      //   price: formData.price,
-      //   sell_price: formData.sell_price,
-      //   quantity: formData.quantity,
-      //   category_id: formData.category_id,
-      // };
+      await productValidationSchema.validate(formData, { abortEarly: false });
 
       const payload = new FormData();
       payload.append('name', formData.name);
@@ -200,30 +147,40 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         response = await updateEntity('product', formData.id, payload);
         setSnackbarMessage('Product updated successfully!');
       }
-      // console.log(payload);
-      // const response = await axios({
-      //   method,
-      //   url,
-      //   data: payload,
-      // });
-      // console.log(response);
-      // setSnackbarMessage(
-      //   formData.id ? 'Product updated successfully!' : 'Product added successfully!'
-      // );
+
       setSnackbarSeverity('success');
       fetchUsers(); // Refresh the product list
       onClose();
     } catch (error: any) {
-      console.log(error.response.data.message);
-      const errorArr = error.response?.data || [];
       // const errorArr = error.response.data;
-      setSnackbarSeverity('error');
 
+      if (error instanceof Yup.ValidationError) {
+        // Collect all validation errors
+        const validationErrors: { [key: string]: string } = {};
+        error.inner.forEach((err: any) => {
+          if (err.path) validationErrors[err.path] = err.message;
+        });
+        setErrors(validationErrors); // Update errors state
+      }
+      // else {
+      //   setSnackbarMessage('An unexpected error occurred.');
+      // }
       if (error.response?.data?.message) {
+        console.log('first');
+        setSnackbarSeverity('error');
         setSnackbarMessage(error.response?.data?.message);
-      } else {
+      } else if (error.response?.data instanceof Array) {
         // errorArr.map((err: string) => setSnackbarMessage(err));
-        errorArr.forEach((err: string) => setSnackbarMessage(err));
+        const errorArr = error.response?.data;
+
+        errorArr.forEach((err: string) => {
+          setSnackbarSeverity('error');
+          setSnackbarMessage(err);
+        });
+      } else {
+        // console.log('i m here');
+        setSnackbarSeverity('error');
+        setSnackbarMessage('form valdation error');
       }
       // setSnackbarMessage('error');
     } finally {
@@ -243,6 +200,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           name="name"
           value={formData?.name || ''}
           onChange={handleChange}
+          error={Boolean(errors.name)}
+          helperText={errors.name}
         />
         <TextField
           fullWidth
@@ -252,6 +211,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           type="number"
           value={formData?.price || ''}
           onChange={handleChange}
+          error={Boolean(errors.price)}
+          helperText={errors.price}
         />
         <TextField
           fullWidth
@@ -261,6 +222,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           type="number"
           value={formData?.sell_price || ''}
           onChange={handleChange}
+          error={Boolean(errors.sell_price)}
+          helperText={errors.sell_price}
         />
         <TextField
           fullWidth
@@ -270,10 +233,17 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           type="number"
           value={formData?.quantity || ''}
           onChange={handleChange}
+          error={Boolean(errors.quantity)}
+          helperText={errors.quantity}
         />
         <FormControl fullWidth margin="dense">
           <InputLabel>Category</InputLabel>
-          <Select name="category_id" value={formData?.category_id || ''} onChange={handleChange}>
+          <Select
+            name="category_id"
+            value={formData?.category_id || ''}
+            onChange={handleChange}
+            error={Boolean(errors.category_id)}
+          >
             <MenuItem value="">Select a category</MenuItem>
             {categories.map((category) => (
               <MenuItem key={category.id} value={category.id}>
@@ -296,13 +266,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
               prevFormData ? { ...prevFormData, barcode: barcodes } : null
             );
           }}
-          // onChange={(e) => {
-          //   const barcodes = e.target.value.split(',').map((item) => ({ name: item.trim() })); // Create array of objects with "name" keys
-
-          //   setFormData((prevFormData) =>
-          //     prevFormData ? { ...prevFormData, barcode: barcodes } : null
-          //   );
-          // }}
+          error={Boolean(errors.barcode)}
+          helperText={errors.barcode}
         />
         <TextField
           fullWidth

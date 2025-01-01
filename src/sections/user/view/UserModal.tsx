@@ -1,5 +1,7 @@
 // import axios from 'axios';
+import * as Yup from 'yup';
 import React, { useState, useEffect } from 'react';
+
 import {
   Dialog,
   DialogTitle,
@@ -14,6 +16,8 @@ import {
   FormControl,
   SelectChangeEvent,
 } from '@mui/material';
+
+import { UserValidationSchema } from '../../validation';
 import { fetchData, createEntity, updateEntity } from '../../apiService';
 
 export interface ProductFormData {
@@ -52,6 +56,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 }) => {
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   // Fetch categories dynamically (replace with actual API if necessary)
   useEffect(() => {
@@ -71,29 +76,11 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       fetchCategories();
     }
   }, [open]);
-  // handleimage for base64
-  // const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (file) {
-  //     const reader = new FileReader();
-  //     reader.onload = () => {
-  //       setFormData((prevFormData) => {
-  //         if (!prevFormData) return null;
-  //         return { ...prevFormData, image: reader.result as string };
-  //       });
-  //     };
-  //     reader.readAsDataURL(file); // Convert image to Base64
-  //   }
-  // };
-  // const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  //   const file = e.target.files?.[0];
-  //   if (file) {
-  //     setFormData((prevFormData) => {
-  //       if (!prevFormData) return null;
-  //       return { ...prevFormData, image: file };
-  //     });
-  //   }
-  // };
+
+  const handleClose = () => {
+    setErrors({});
+    onClose(); // Call onClose to close the modal
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] !== undefined ? e.target.files?.[0] : null;
@@ -128,15 +115,10 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         setSnackbarOpen(true);
         return;
       }
-      // base 64
-      // const payload = {
-      //   name: formData.name,
-      //   username: formData.username,
-      //   password: formData.password,
-      //   phone: formData.phone,
-      //   role: formData.role,
-      //   image: formData.image === '' ? null : formData.image,
-      // };
+
+      // Validate form data with Yup
+      await UserValidationSchema.validate(formData, { abortEarly: false });
+
       // Construct a FormData object
       const formDataToSend = new FormData();
       formDataToSend.append('name', formData.name);
@@ -151,14 +133,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       }
 
       let response;
-      // base64
-      // if (!formData.id) {
-      //   response = await createEntity('user', payload);
-      //   setSnackbarMessage('User added successfully!');
-      // } else {
-      //   response = await updateEntity('user', formData.id, payload);
-      //   setSnackbarMessage('User updated successfully!');
-      // }
+
       if (!formData.id) {
         const defaultImageResponse = await fetch('/DPI.jpg'); // Adjust path based on your public folder
         const defaultImageBlob = await defaultImageResponse.blob();
@@ -177,15 +152,35 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       fetchUsers(); // Refresh the product list
       onClose();
     } catch (error: any) {
-      const errorArr = error.response?.data || [];
       // const errorArr = error.response.data;
-      setSnackbarSeverity('error');
 
+      if (error instanceof Yup.ValidationError) {
+        // Collect all validation errors
+        const validationErrors: { [key: string]: string } = {};
+        error.inner.forEach((err: any) => {
+          if (err.path) validationErrors[err.path] = err.message;
+        });
+        setErrors(validationErrors); // Update errors state
+      }
+      // else {
+      //   setSnackbarMessage('An unexpected error occurred.');
+      // }
       if (error.response?.data?.message) {
+        console.log('first');
+        setSnackbarSeverity('error');
         setSnackbarMessage(error.response?.data?.message);
-      } else {
+      } else if (error.response?.data instanceof Array) {
         // errorArr.map((err: string) => setSnackbarMessage(err));
-        errorArr.forEach((err: string) => setSnackbarMessage(err));
+        const errorArr = error.response?.data;
+
+        errorArr.forEach((err: string) => {
+          setSnackbarSeverity('error');
+          setSnackbarMessage(err);
+        });
+      } else {
+        // console.log('i m here');
+        setSnackbarSeverity('error');
+        setSnackbarMessage('form valdation error');
       }
       // setSnackbarMessage('error');
     } finally {
@@ -205,6 +200,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           name="name"
           value={formData?.name || ''}
           onChange={handleChange}
+          error={Boolean(errors.name)}
+          helperText={errors.name}
         />
         <TextField
           fullWidth
@@ -213,23 +210,29 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           name="username"
           value={formData?.username || ''}
           onChange={handleChange}
+          error={Boolean(errors.username)}
+          helperText={errors.username}
         />
         <TextField
           fullWidth
           margin="dense"
           label="password"
           name="password"
+          type="password"
           value={formData?.password || ''}
           onChange={handleChange}
+          error={Boolean(errors.password)}
+          helperText={errors.password}
         />
         <TextField
           fullWidth
           margin="dense"
           label="phone"
           name="phone"
-          type="number"
           value={formData?.phone || ''}
           onChange={handleChange}
+          error={Boolean(errors.phone)}
+          helperText={errors.phone}
         />
         <TextField
           fullWidth
@@ -238,6 +241,8 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           name="role"
           value={formData?.role || ''}
           onChange={handleChange}
+          error={Boolean(errors.role)}
+          helperText={errors.role}
         />
         {/* <FormControl fullWidth margin="dense">
           <InputLabel>Role</InputLabel>
@@ -246,14 +251,6 @@ export const ProductModal: React.FC<ProductModalProps> = ({
             <MenuItem value="user">User</MenuItem>
           </Select>
         </FormControl> */}
-        {/* <TextField
-          fullWidth
-          margin="dense"
-          label="image"
-          name="image"
-          value={formData?.image || ''}
-          onChange={handleChange}
-        /> */}
         <TextField
           fullWidth
           margin="dense"
@@ -261,20 +258,9 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           InputLabelProps={{ shrink: true }}
           onChange={handleImageChange}
         />
-        {/* <FormControl fullWidth margin="dense">
-          <InputLabel>Category</InputLabel>
-          <Select name="category_id" value={formData?.category_id || ''} onChange={handleChange}>
-            <MenuItem value="">Select a category</MenuItem>
-            {categories.map((category) => (
-              <MenuItem key={category.id} value={category.id}>
-                {category.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl> */}
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} variant="outlined">
+        <Button onClick={handleClose} variant="outlined">
           Cancel
         </Button>
         <Button
