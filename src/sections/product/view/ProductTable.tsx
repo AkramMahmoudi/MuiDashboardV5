@@ -1,5 +1,7 @@
 import React from 'react';
+
 import {
+  Stack,
   Table,
   TableBody,
   TableCell,
@@ -62,12 +64,18 @@ export const ProductTable: React.FC<ProductTableProps> = ({
                 <TableCell>{user.sell_price}</TableCell>
                 <TableCell>{user.quantity}</TableCell>
                 <TableCell>
-                  <IconButton color="primary" onClick={() => onEdit(user)}>
-                    <Iconify icon="eva:edit-2-outline" />
-                  </IconButton>
-                  <IconButton color="error" onClick={() => onDelete(user.id)}>
-                    <Iconify icon="eva:trash-2-outline" />
-                  </IconButton>
+                  <Stack
+                    direction={{ xs: 'row', sm: 'row' }} // Keep buttons inline for all screen sizes
+                    spacing={1} // Add spacing between buttons
+                    justifyContent="flex-start" // Adjust alignment as needed
+                  >
+                    <IconButton color="primary" onClick={() => onEdit(user)}>
+                      <Iconify icon="eva:edit-2-outline" />
+                    </IconButton>
+                    <IconButton color="error" onClick={() => onDelete(user.id)}>
+                      <Iconify icon="eva:trash-2-outline" />
+                    </IconButton>
+                  </Stack>
                 </TableCell>
               </TableRow>
             ))}
