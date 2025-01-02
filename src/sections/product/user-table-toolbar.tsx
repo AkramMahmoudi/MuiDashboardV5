@@ -5,6 +5,8 @@ import Typography from '@mui/material/Typography';
 import IconButton from '@mui/material/IconButton';
 import OutlinedInput from '@mui/material/OutlinedInput';
 import InputAdornment from '@mui/material/InputAdornment';
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs, { Dayjs } from 'dayjs';
 
 import { Iconify } from 'src/components/iconify';
 
@@ -20,6 +22,10 @@ type UserTableToolbarProps = {
   categories: Category[]; // قائمة الفئات
   selectedCategory: string | number; // الفئة المختارة
   onCategoryChange: (event: React.ChangeEvent<HTMLInputElement>) => void; // تغيير الفئة
+  startDate: Date | null; // Start date for filtering
+  endDate: Date | null; // End date for filtering
+  onStartDateChange: (date: Date | null) => void; // Start date change handler
+  onEndDateChange: (date: Date | null) => void; // End date change handler
 };
 
 export function UserTableToolbar({
@@ -29,6 +35,10 @@ export function UserTableToolbar({
   categories,
   selectedCategory,
   onCategoryChange,
+  startDate,
+  endDate,
+  onStartDateChange,
+  onEndDateChange,
 }: UserTableToolbarProps) {
   return (
     <Toolbar
@@ -68,18 +78,52 @@ export function UserTableToolbar({
               </option>
             ))}
           </TextField>
+          {/* Date Pickers */}
+          <DatePicker
+            label="Start Date"
+            value={startDate ? dayjs(startDate) : null}
+            onChange={
+              (newDate: Dayjs | null) => onStartDateChange(newDate ? newDate.toDate() : null) // Convert Dayjs to Date
+            }
+            slots={{
+              textField: TextField,
+            }}
+            slotProps={{
+              textField: { size: 'small' },
+            }}
+          />
+          <DatePicker
+            label="End Date"
+            value={endDate ? dayjs(endDate) : null} // Convert Date to Dayjs
+            onChange={
+              (newDate: Dayjs | null) => onEndDateChange(newDate ? newDate.toDate() : null) // Convert Dayjs to Date
+            }
+            slots={{
+              textField: TextField,
+            }}
+            slotProps={{
+              textField: { size: 'small' },
+            }}
+          />
           {/* search input */}
           <OutlinedInput
             fullWidth
             value={filterName}
             onChange={onFilterName}
-            placeholder="Search user..."
+            placeholder="Search Product..."
             startAdornment={
               <InputAdornment position="start">
                 <Iconify width={20} icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
               </InputAdornment>
             }
-            sx={{ maxWidth: 320 }}
+            sx={{
+              maxWidth: 320,
+              height: 40, // Set the height
+              '& .MuiInputBase-input': {
+                padding: '12px', // Adjust the padding for the text inside the input
+                fontSize: '14px', // Adjust font size if needed
+              },
+            }}
           />
         </div>
       )}

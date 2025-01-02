@@ -1,5 +1,7 @@
 import axios from 'axios';
 import React, { useRef, useState, useEffect, useCallback } from 'react';
+import { DatePicker } from '@mui/x-date-pickers';
+import dayjs from 'dayjs'; // Optional for formatting dates
 
 import {
   Box,
@@ -85,6 +87,9 @@ export function ProductsView() {
 
   const [selectedItems, setSelectedItems] = useState<number[]>([]); // assuming selectedItems is an array of numbers
 
+  const [startDate, setStartDate] = useState<Date | null>(null);
+  const [endDate, setEndDate] = useState<Date | null>(null);
+
   const fetchCategories = async () => {
     try {
       const response = await fetchData<Category>(
@@ -106,6 +111,8 @@ export function ProductsView() {
           name: !isBarcode ? fName : undefined,
           barcode: isBarcode ? fName : undefined,
           category_id: selectedCategory !== 'All' ? selectedCategory : undefined,
+          from: startDate ? dayjs(startDate).format('YYYY-MM-DD') : undefined,
+          to: endDate ? dayjs(endDate).format('YYYY-MM-DD') : undefined,
         };
 
         const { data, per_page, total } = await fetchData<User>(
@@ -120,7 +127,7 @@ export function ProductsView() {
         console.error('Error fetching users:', error);
       }
     },
-    [selectedCategory]
+    [selectedCategory, startDate, endDate]
   );
 
   useEffect(() => {
@@ -158,7 +165,7 @@ export function ProductsView() {
   };
 
   const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFilterName(event.target.value.trim());
+    setFilterName(event.target.value);
     setPage(0);
   };
 
@@ -216,6 +223,10 @@ export function ProductsView() {
             setPage(0);
             fetchUsers(1, filterName);
           }}
+          startDate={startDate}
+          endDate={endDate}
+          onStartDateChange={(date) => setStartDate(date)}
+          onEndDateChange={(date) => setEndDate(date)}
         />
 
         <Scrollbar>
