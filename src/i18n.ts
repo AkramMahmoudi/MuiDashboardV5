@@ -1,6 +1,8 @@
 import i18n from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import LanguageDetector from 'i18next-browser-languagedetector';
+import ar from './ar.json';
+import en from './en.json';
 
 i18n
   .use(LanguageDetector) // Automatically detect user language
@@ -8,16 +10,10 @@ i18n
   .init({
     resources: {
       en: {
-        translation: {
-          welcome: "Welcome to the dashboard!",
-          language: "Language",
-        },
+        translation: en,
       },
       ar: {
-        translation: {
-          welcome: "مرحبًا بك في لوحة التحكم!",
-          language: "اللغة",
-        },
+        translation: ar,
       },
     },
     fallbackLng: "en", // Default language

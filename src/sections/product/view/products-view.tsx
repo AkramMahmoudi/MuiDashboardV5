@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useRef, useState, useEffect, useCallback } from 'react';
 import { DatePicker } from '@mui/x-date-pickers';
 import dayjs from 'dayjs'; // Optional for formatting dates
+import { useTranslation } from 'react-i18next';
 
 import {
   Box,
@@ -63,6 +64,8 @@ type ApiResponse<T> = {
 };
 
 export function ProductsView() {
+  const { t } = useTranslation(); // Hook for translations
+
   const [filterName, setFilterName] = useState('');
   const [users, setUsers] = useState<User[]>([]);
   const [page, setPage] = useState(0);
@@ -198,7 +201,7 @@ export function ProductsView() {
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
-          Products
+         {t('products.title')}
         </Typography>
         <Button
           variant="contained"
@@ -206,7 +209,7 @@ export function ProductsView() {
           startIcon={<Iconify icon="mingcute:add-line" />}
           onClick={() => handleOpenModal()}
         >
-          New Product
+          {t('products.new_product')}
         </Button>
       </Box>
 
@@ -263,15 +266,15 @@ export function ProductsView() {
       </Snackbar>
       {/* Confirmation Dialog */}
       <Dialog open={confirmDialogOpen} onClose={handleCloseConfirmDialog}>
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle>{t('products.confirm_delete')}</DialogTitle>
         <DialogContent>
           <DialogContentText>
-            Are you sure you want to delete this product? This action cannot be undone.
+          {t('products.delete_warning')}
           </DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseConfirmDialog} variant="outlined">
-            Cancel
+          {t('products.cancel')}
           </Button>
 
           <Button
@@ -294,7 +297,7 @@ export function ProductsView() {
             disabled={loading}
             startIcon={loading && <CircularProgress size={20} />}
           >
-            {loading ? 'Deleting...' : 'Delete'}
+            {loading ? t('products.deleting') : t('products.delete')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -1,0 +1,21 @@
+{
+  "products": {
+    "title": "المنتجات",
+    "new_product": "منتج جديد",
+    "confirm_delete": "تأكيد الحذف",
+    "delete_warning": "هل أنت متأكد أنك تريد حذف هذا المنتج؟ هذا الإجراء لا يمكن التراجع عنه.",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "deleting": "جارٍ الحذف..."
+  },
+  "toolbar": {
+    "category": "الفئة",
+    "all_categories": "كل الفئات",
+    "start_date": "تاريخ البداية",
+    "end_date": "تاريخ النهاية",
+    "search_product": "ابحث عن منتج...",
+    "selected": "تم اختيار",
+    "delete": "حذف",
+    "filter_list": "تصفية القائمة"
+  }
+}

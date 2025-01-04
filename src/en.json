@@ -1,0 +1,21 @@
+{
+  "products": {
+    "title": "Products",
+    "new_product": "New Product",
+    "confirm_delete": "Confirm Delete",
+    "delete_warning": "Are you sure you want to delete this product? This action cannot be undone.",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting..."
+  },
+  "toolbar": {
+    "category": "Category",
+    "all_categories": "All Categories",
+    "start_date": "Start Date",
+    "end_date": "End Date",
+    "search_product": "Search Product...",
+    "selected": "selected",
+    "delete": "Delete",
+    "filter_list": "Filter list"
+  }
+}
