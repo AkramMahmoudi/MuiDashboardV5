@@ -32,23 +32,51 @@ const renderFallback = (
   </Box>
 );
 
+// export function Router() {
+//   return useRoutes([
+//     {
+//       element: (
+//         <DashboardLayout>
+//           <Suspense fallback={renderFallback}>
+//             <Outlet />
+//           </Suspense>
+//         </DashboardLayout>
+//       ),
+//       children: [
+//         { element: <HomePage />, index: true },
+//         { path: 'users', element: <UsersPage /> },
+//         { path: 'products', element: <ProductsPage /> },
+//         { path: 'blog', element: <BlogPage /> },
+//       ],
+//     },
+//     {
+//       path: 'sign-in',
+//       element: (
+//         <AuthLayout>
+//           <SignInPage />
+//         </AuthLayout>
+//       ),
+//     },
+//     {
+//       path: '404',
+//       element: <Page404 />,
+//     },
+//     {
+//       path: '*',
+//       element: <Navigate to="/404" replace />,
+//     },
+//   ]);
+// }
+
+const isAuthenticated = () => localStorage.getItem('token');
+
+// PrivateRoute Component
+const PrivateRoute = ({ children }: { children: JSX.Element }) =>
+  isAuthenticated() ? children : <Navigate to="/sign-in" replace />;
+
+// Router Configuration
 export function Router() {
   return useRoutes([
-    {
-      element: (
-        <DashboardLayout>
-          <Suspense fallback={renderFallback}>
-            <Outlet />
-          </Suspense>
-        </DashboardLayout>
-      ),
-      children: [
-        { element: <HomePage />, index: true },
-        { path: 'users', element: <UsersPage /> },
-        { path: 'products', element: <ProductsPage /> },
-        { path: 'blog', element: <BlogPage /> },
-      ],
-    },
     {
       path: 'sign-in',
       element: (
@@ -56,6 +84,23 @@ export function Router() {
           <SignInPage />
         </AuthLayout>
       ),
+    },
+    {
+      element: (
+        <PrivateRoute>
+          <DashboardLayout>
+            <Suspense fallback={renderFallback}>
+              <Outlet />
+            </Suspense>
+          </DashboardLayout>
+        </PrivateRoute>
+      ),
+      children: [
+        { element: <HomePage />, index: true },
+        { path: 'users', element: <UsersPage /> },
+        { path: 'products', element: <ProductsPage /> },
+        { path: 'blog', element: <BlogPage /> },
+      ],
     },
     {
       path: '404',
