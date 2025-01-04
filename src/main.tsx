@@ -4,9 +4,12 @@ import { BrowserRouter } from 'react-router-dom';
 import { HelmetProvider } from 'react-helmet-async';
 // import { UsersPage } from './routes/sections';
 
+import { I18nextProvider } from 'react-i18next';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+
 import App from './app';
+import i18n from './i18n';
 
 // ----------------------------------------------------------------------
 
@@ -18,7 +21,9 @@ root.render(
       <BrowserRouter>
         <Suspense>
           <LocalizationProvider dateAdapter={AdapterDayjs}>
-            <App />
+            <I18nextProvider i18n={i18n}>
+              <App />
+            </I18nextProvider>
           </LocalizationProvider>
         </Suspense>
       </BrowserRouter>

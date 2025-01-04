@@ -1,12 +1,14 @@
 import type { Theme } from '@mui/material/styles';
-
+import createCache from '@emotion/cache';
+import rtlPlugin from 'stylis-plugin-rtl';
+import { CacheProvider } from '@emotion/react';
 import { experimental_extendTheme as extendTheme } from '@mui/material/styles';
 
 import { shadows, typography, components, colorSchemes, customShadows } from './core';
 
 // ----------------------------------------------------------------------
 
-export function createTheme(): Theme {
+export function createTheme(direction: 'ltr' | 'rtl' = 'ltr'): Theme {
   const initialTheme = {
     colorSchemes,
     shadows: shadows(),
@@ -16,6 +18,7 @@ export function createTheme(): Theme {
     typography,
     cssVarPrefix: '',
     shouldSkipGeneratingVar,
+    direction,
   };
 
   const theme = extendTheme(initialTheme);
@@ -55,4 +58,10 @@ function shouldSkipGeneratingVar(keys: string[], value: string | number): boolea
   }
 
   return keys.some((key) => skipGlobalKeys?.includes(key));
+}
+export function createEmotionCache(direction: 'ltr' | 'rtl') {
+  return createCache({
+    key: direction === 'rtl' ? 'mui-rtl' : 'mui',
+    stylisPlugins: direction === 'rtl' ? [rtlPlugin] : [],
+  });
 }
