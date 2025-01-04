@@ -65,7 +65,7 @@ export function UserTableToolbar({
     >
       {numSelected > 0 ? (
         <Typography component="div" variant="subtitle1">
-          {numSelected} selected
+          {numSelected} {t('toolbar.selected')}
         </Typography>
       ) : (
         <Box
@@ -80,7 +80,7 @@ export function UserTableToolbar({
           {/* Dropdown Filter */}
           <TextField
             select
-            label={t('category')}
+            label={t('toolbar.category')}
             value={selectedCategory}
             onChange={onCategoryChange}
             SelectProps={{
@@ -89,7 +89,7 @@ export function UserTableToolbar({
             size="small"
             sx={{ width: { xs: '100%', sm: 'auto' } }} // Full width on mobile
           >
-            <option value="All">{t('all_categories')}</option>
+            <option value="All">{t('toolbar.all_categories')}</option>
             {categories.map((category) => (
               <option key={category.id} value={category.id}>
                 {category.name}
@@ -99,7 +99,7 @@ export function UserTableToolbar({
 
           {/* Date Pickers */}
           <DatePicker
-            label={t('start_date')}
+            label={t('toolbar.start_date')}
             value={startDate ? dayjs(startDate) : null}
             onChange={(newDate: Dayjs | null) =>
               onStartDateChange(newDate ? newDate.toDate() : null)
@@ -115,7 +115,7 @@ export function UserTableToolbar({
             }}
           />
           <DatePicker
-            label={t('end_date')}
+            label={t('toolbar.end_date')}
             value={endDate ? dayjs(endDate) : null}
             onChange={(newDate: Dayjs | null) => onEndDateChange(newDate ? newDate.toDate() : null)}
             slots={{
@@ -134,7 +134,7 @@ export function UserTableToolbar({
             fullWidth
             value={filterName}
             onChange={onFilterName}
-            placeholder={t('search_product')}
+            placeholder={t('toolbar.search_product')}
             startAdornment={
               <InputAdornment position="start">
                 <Iconify width={20} icon="eva:search-fill" sx={{ color: 'text.disabled' }} />
@@ -153,13 +153,13 @@ export function UserTableToolbar({
       )}
 
       {numSelected > 0 ? (
-        <Tooltip title={t('delete')}>
+        <Tooltip title={t('toolbar.delete')}>
           <IconButton>
             <Iconify icon="solar:trash-bin-trash-bold" />
           </IconButton>
         </Tooltip>
       ) : (
-        <Tooltip title={t('filter_list')}>
+        <Tooltip title={t('toolbar.filter_list')}>
           <IconButton>
             <Iconify icon="ic:round-filter-list" />
           </IconButton>
