@@ -22,6 +22,7 @@ import {
   DialogContentText,
   DialogTitle,
 } from '@mui/material';
+import { useTranslation } from 'react-i18next';
 import { DashboardContent } from 'src/layouts/dashboard';
 import { Iconify } from 'src/components/iconify';
 import { Scrollbar } from 'src/components/scrollbar';
@@ -40,15 +41,6 @@ interface User {
   role: string;
   image: File | null;
 }
-
-// type Category = {
-//   id: number;
-//   name: string;
-//   deleted_at: string | null;
-//   created_at: string;
-//   updated_at: string;
-//   user_id: number | null;
-// };
 type ApiResponse<T> = {
   data: T;
   total: number;
@@ -84,17 +76,7 @@ export function UserView() {
 
   const [selectedItems, setSelectedItems] = useState<number[]>([]); // assuming selectedItems is an array of numbers
 
-  // const fetchCategories = async () => {
-  //   try {
-  //     const response = await fetchData<Category>(
-  //       `${import.meta.env.VITE_API_BASE_URL}/api/categories`,
-  //       {}
-  //     );
-  //     setCategories(response.data);
-  //   } catch (error) {
-  //     console.error('Error fetching categories:', error);
-  //   }
-  // };
+  const { t } = useTranslation();
   // Fetch Data
   const fetchUsers = useCallback(
     async (p: number, fName: string) => {
@@ -187,7 +169,7 @@ export function UserView() {
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
-          Users
+          {t('users.title')}
         </Typography>
         <Button
           variant="contained"
@@ -195,7 +177,7 @@ export function UserView() {
           startIcon={<Iconify icon="mingcute:add-line" />}
           onClick={() => handleOpenModal()}
         >
-          New User
+          {t('users.new_user')}
         </Button>
       </Box>
 
@@ -234,6 +216,10 @@ export function UserView() {
           rowsPerPage={rowsPerPage}
           onPageChange={handlePageChange}
           rowsPerPageOptions={[rowsPerPage]}
+          labelRowsPerPage={t('pagination.rowsPerPage')}
+          labelDisplayedRows={({ from, to, count }) =>
+            t('pagination.displayedRows', { from, to, count })
+          }
         />
       </Card>
       <Snackbar
@@ -248,15 +234,13 @@ export function UserView() {
       </Snackbar>
       {/* Confirmation Dialog */}
       <Dialog open={confirmDialogOpen} onClose={handleCloseConfirmDialog}>
-        <DialogTitle>Confirm Delete</DialogTitle>
+        <DialogTitle>{t('users.confirm_delete')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-            Are you sure you want to delete this product? This action cannot be undone.
-          </DialogContentText>
+          <DialogContentText>{t('users.delete_warning')}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseConfirmDialog} variant="outlined">
-            Cancel
+            {t('users.cancel')}
           </Button>
 
           <Button
@@ -279,7 +263,7 @@ export function UserView() {
             disabled={loading}
             startIcon={loading && <CircularProgress size={20} />}
           >
-            {loading ? 'Deleting...' : 'Delete'}
+            {loading ? t('users.deleting') : t('users.delete')}
           </Button>
         </DialogActions>
       </Dialog>

@@ -17,6 +17,7 @@ import {
   SelectChangeEvent,
 } from '@mui/material';
 
+import { useTranslation } from 'react-i18next';
 import { productValidationSchema } from '../../validation';
 import { fetchData, createEntity, updateEntity } from '../../apiService';
 
@@ -58,7 +59,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
+  const { t } = useTranslation();
   // Fetch categories dynamically (replace with actual API if necessary)
   useEffect(() => {
     if (open) {
@@ -191,12 +192,12 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>{formData?.id ? 'Edit Product' : 'New Product'}</DialogTitle>
+      <DialogTitle>{formData?.id ? t('modal.title.edit') : t('modal.title.add')}</DialogTitle>{' '}
       <DialogContent>
         <TextField
           fullWidth
           margin="dense"
-          label="Name"
+          label={t('modal.name')}
           name="name"
           value={formData?.name || ''}
           onChange={handleChange}
@@ -206,7 +207,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         <TextField
           fullWidth
           margin="dense"
-          label="Price"
+          label={t('modal.price')}
           name="price"
           type="number"
           value={formData?.price || ''}
@@ -217,7 +218,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         <TextField
           fullWidth
           margin="dense"
-          label="Sell Price"
+          label={t('modal.sellPrice')}
           name="sell_price"
           type="number"
           value={formData?.sell_price || ''}
@@ -228,7 +229,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         <TextField
           fullWidth
           margin="dense"
-          label="Quantity"
+          label={t('modal.quantity')}
           name="quantity"
           type="number"
           value={formData?.quantity || ''}
@@ -237,14 +238,14 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           helperText={errors.quantity}
         />
         <FormControl fullWidth margin="dense">
-          <InputLabel>Category</InputLabel>
+          <InputLabel>{t('modal.category')}</InputLabel>
           <Select
             name="category_id"
             value={formData?.category_id || ''}
             onChange={handleChange}
             error={Boolean(errors.category_id)}
           >
-            <MenuItem value="">Select a category</MenuItem>
+            <MenuItem value="">{t('modal.category')}</MenuItem>
             {categories.map((category) => (
               <MenuItem key={category.id} value={category.id}>
                 {category.name}
@@ -255,7 +256,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         <TextField
           fullWidth
           margin="dense"
-          label="Barcode"
+          label={t('modal.barcode')}
           name="barcode"
           value={formData?.barcode?.map((barcodeObj) => barcodeObj.name).join(', ') || ''} // Join the array into a comma-separated string
           onChange={(e) => {
@@ -279,7 +280,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} variant="outlined">
-          Cancel
+          {t('modal.cancel')}
         </Button>
         <Button
           onClick={handleSave}
@@ -288,7 +289,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           disabled={loading}
           startIcon={loading && <CircularProgress size={20} />}
         >
-          {loading ? 'Saving...' : 'Save'}
+          {loading ? t('modal.saving') : t('modal.save')}
         </Button>
       </DialogActions>
     </Dialog>

@@ -64,7 +64,7 @@ type ApiResponse<T> = {
 };
 
 export function ProductsView() {
-  const { t } = useTranslation(); // Hook for translations
+  const { t, i18n } = useTranslation(); // Hook for translations
 
   const [filterName, setFilterName] = useState('');
   const [users, setUsers] = useState<User[]>([]);
@@ -201,7 +201,7 @@ export function ProductsView() {
     <DashboardContent>
       <Box display="flex" alignItems="center" mb={5}>
         <Typography variant="h4" flexGrow={1}>
-         {t('products.title')}
+          {t('products.title')}
         </Typography>
         <Button
           variant="contained"
@@ -252,6 +252,10 @@ export function ProductsView() {
           rowsPerPage={rowsPerPage}
           onPageChange={handlePageChange}
           rowsPerPageOptions={[rowsPerPage]}
+          labelRowsPerPage={t('pagination.rowsPerPage')} // Translating "Rows per page"
+          labelDisplayedRows={
+            ({ from, to, count }) => t('pagination.displayedRows', { from, to, count }) // Translating "1–10 of 100"
+          }
         />
       </Card>
       <Snackbar
@@ -268,13 +272,11 @@ export function ProductsView() {
       <Dialog open={confirmDialogOpen} onClose={handleCloseConfirmDialog}>
         <DialogTitle>{t('products.confirm_delete')}</DialogTitle>
         <DialogContent>
-          <DialogContentText>
-          {t('products.delete_warning')}
-          </DialogContentText>
+          <DialogContentText>{t('products.delete_warning')}</DialogContentText>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseConfirmDialog} variant="outlined">
-          {t('products.cancel')}
+            {t('products.cancel')}
           </Button>
 
           <Button

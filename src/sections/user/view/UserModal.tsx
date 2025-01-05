@@ -1,7 +1,7 @@
 // import axios from 'axios';
 import * as Yup from 'yup';
 import React, { useState, useEffect } from 'react';
-
+import { useTranslation } from 'react-i18next';
 import {
   Dialog,
   DialogTitle,
@@ -57,7 +57,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
   const [loading, setLoading] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
+  const { t } = useTranslation();
   // Fetch categories dynamically (replace with actual API if necessary)
   useEffect(() => {
     if (open) {
@@ -191,12 +191,12 @@ export const ProductModal: React.FC<ProductModalProps> = ({
 
   return (
     <Dialog open={open} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>{formData?.id ? 'Edit User' : 'New User'}</DialogTitle>
+      <DialogTitle>{formData?.id ? t('modalU.edit_user') : t('modalU.new_user')}</DialogTitle>
       <DialogContent>
         <TextField
           fullWidth
           margin="dense"
-          label="Name"
+          label={t('modalU.name')}
           name="name"
           value={formData?.name || ''}
           onChange={handleChange}
@@ -206,7 +206,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         <TextField
           fullWidth
           margin="dense"
-          label="username"
+          label={t('modalU.username')}
           name="username"
           value={formData?.username || ''}
           onChange={handleChange}
@@ -216,7 +216,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         <TextField
           fullWidth
           margin="dense"
-          label="password"
+          label={t('modalU.password')}
           name="password"
           type="password"
           value={formData?.password || ''}
@@ -227,7 +227,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         <TextField
           fullWidth
           margin="dense"
-          label="phone"
+          label={t('modalU.phone')}
           name="phone"
           value={formData?.phone || ''}
           onChange={handleChange}
@@ -237,7 +237,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
         <TextField
           fullWidth
           margin="dense"
-          label="role"
+          label={t('modalU.role')}
           name="role"
           value={formData?.role || ''}
           onChange={handleChange}
@@ -261,7 +261,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} variant="outlined">
-          Cancel
+          {t('modalU.cancel')}
         </Button>
         <Button
           onClick={handleSave}
@@ -270,7 +270,7 @@ export const ProductModal: React.FC<ProductModalProps> = ({
           disabled={loading}
           startIcon={loading && <CircularProgress size={20} />}
         >
-          {loading ? 'Saving...' : 'Save'}
+          {loading ? t('modalU.saving') : t('modalU.save')}
         </Button>
       </DialogActions>
     </Dialog>

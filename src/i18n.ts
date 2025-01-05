@@ -16,7 +16,8 @@ i18n
         translation: ar,
       },
     },
-    fallbackLng: "en", // Default language
+    lng: 'en',
+    fallbackLng: 'en', // Default language
     interpolation: {
       escapeValue: false, // React already escapes values
     },

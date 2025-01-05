@@ -1,5 +1,5 @@
 import React from 'react';
-
+import { useTranslation } from 'react-i18next';
 import {
   Stack,
   Table,
@@ -34,6 +34,8 @@ export const ProductTable: React.FC<ProductTableProps> = ({
   onPageChange,
   onSelectItem,
 }) => {
+  const { t } = useTranslation();
+
   const handleCheckboxChange = (itemId: number) => {
     onSelectItem(itemId); // Call the handleSelectItem function when a checkbox is clicked
   };
@@ -47,13 +49,13 @@ export const ProductTable: React.FC<ProductTableProps> = ({
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>ID</TableCell>
-              <TableCell>image</TableCell>
-              <TableCell>Name</TableCell>
-              <TableCell>username</TableCell>
-              <TableCell>phone</TableCell>
-              <TableCell>role</TableCell>
-              <TableCell>Actions</TableCell>
+              <TableCell>{t('users.table.id')}</TableCell>
+              <TableCell>{t('users.table.image')}</TableCell>
+              <TableCell>{t('users.table.name')}</TableCell>
+              <TableCell>{t('users.table.username')}</TableCell>
+              <TableCell>{t('users.table.phone')}</TableCell>
+              <TableCell>{t('users.table.role')}</TableCell>
+              <TableCell>{t('users.table.actions')}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

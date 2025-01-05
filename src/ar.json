@@ -17,5 +17,68 @@
     "selected": "تم اختيار",
     "delete": "حذف",
     "filter_list": "تصفية القائمة"
+  },
+  "productTable": {
+    "id": "معرف",
+    "name": "الاسم",
+    "price": "السعر",
+    "sellPrice": "سعر البيع",
+    "quantity": "الكمية",
+    "actions": "الإجراءات"
+  },
+  "pagination": {
+    "rowsPerPage": "الصفوف في الصفحة",
+    "displayedRows": "{{from}}–{{to}} من {{count}}"
+  },
+  "modal": {
+    "title": {
+      "add": "منتج جديد",
+      "edit": "تعديل المنتج"
+    },
+    "name": "الاسم",
+    "price": "السعر",
+    "sellPrice": "سعر البيع",
+    "quantity": "الكمية",
+    "category": "اختر التصنيف",
+    "barcode": "الباركود",
+    "image": "الصورة",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "saving": "جاري الحفظ..."
+  },
+  "users": {
+    "title": "المستخدمين",
+    "new_user": "مستخدم جديد",
+    "confirm_delete": "تأكيد الحذف",
+    "delete_warning": "هل أنت متأكد أنك تريد حذف هذا المستخدم؟ لا يمكن التراجع عن هذا الإجراء.",
+    "cancel": "إلغاء",
+    "delete": "حذف",
+    "deleting": "جاري الحذف...",
+    "selected_count": "تم تحديد {count}",
+    "search_placeholder": "ابحث عن مستخدم...",
+    "delete_tooltip": "حذف",
+    "filter_tooltip": "تصفية القائمة",
+    "table": {
+      "id": "المعرف",
+      "image": "الصورة",
+      "name": "الاسم",
+      "username": "اسم المستخدم",
+      "phone": "الهاتف",
+      "role": "الدور",
+      "actions": "الإجراءات"
+    }
+  },
+  "modalU": {
+    "edit_user": "تعديل المستخدم",
+    "new_user": "مستخدم جديد",
+    "name": "الاسم",
+    "username": "اسم المستخدم",
+    "password": "كلمة المرور",
+    "phone": "الهاتف",
+    "role": "الدور",
+    "image": "الصورة",
+    "cancel": "إلغاء",
+    "save": "حفظ",
+    "saving": "جاري الحفظ..."
   }
 }

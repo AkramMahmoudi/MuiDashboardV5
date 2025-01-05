@@ -97,7 +97,7 @@ export const postData = async (
       params
     );
     if (response.status === 200) {
-      console.log(response.data.data);
+      // console.log(response.data.data);
       const TOKEN = response.data.data;
       localStorage.setItem('token', TOKEN);
 
