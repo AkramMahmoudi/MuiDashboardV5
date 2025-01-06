@@ -20,6 +20,7 @@
   },
   "productTable": {
     "id": "ID",
+    "image": "Image",
     "name": "Name",
     "price": "Price",
     "sellPrice": "Sell Price",
