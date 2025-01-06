@@ -104,11 +104,11 @@ export const _langs = [
     label: 'English',
     icon: '/assets/icons/flags/ic-flag-en.svg',
   },
-  {
-    value: 'de',
-    label: 'German',
-    icon: '/assets/icons/flags/ic-flag-de.svg',
-  },
+  // {
+  //   value: 'de',
+  //   label: 'German',
+  //   icon: '/assets/icons/flags/ic-flag-de.svg',
+  // },
   {
     value: 'ar',
     label: 'العربية',
