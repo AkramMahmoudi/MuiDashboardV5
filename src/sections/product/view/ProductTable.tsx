@@ -50,6 +50,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
           <TableHead>
             <TableRow>
               <TableCell>{t('productTable.id')}</TableCell>
+              <TableCell>{t('productTable.image')}</TableCell>
               <TableCell>{t('productTable.name')}</TableCell>
               <TableCell>{t('productTable.price')}</TableCell>
               <TableCell>{t('productTable.sellPrice')}</TableCell>
@@ -61,6 +62,7 @@ export const ProductTable: React.FC<ProductTableProps> = ({
             {users.map((user) => (
               <TableRow key={user.id}>
                 <TableCell>{user.id}</TableCell>
+                <TableCell>{user.image}</TableCell>
                 <TableCell>{user.name}</TableCell>
                 <TableCell>{user.price}</TableCell>
                 <TableCell>{user.sell_price}</TableCell>

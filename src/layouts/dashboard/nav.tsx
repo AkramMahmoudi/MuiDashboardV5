@@ -1,4 +1,5 @@
 import type { Theme, SxProps, Breakpoint } from '@mui/material/styles';
+import { useTranslation } from 'react-i18next';
 
 import { useEffect } from 'react';
 
@@ -15,7 +16,6 @@ import { varAlpha } from 'src/theme/styles';
 
 import { Logo } from 'src/components/logo';
 import { Scrollbar } from 'src/components/scrollbar';
-
 
 // import { WorkspacesPopover } from '../components/workspaces-popover';
 
@@ -46,6 +46,7 @@ export function NavDesktop({
   layoutQuery,
 }: NavContentProps & { layoutQuery: Breakpoint }) {
   const theme = useTheme();
+  const { t } = useTranslation(); // Hook for translations
 
   return (
     <Box
@@ -68,7 +69,11 @@ export function NavDesktop({
         ...sx,
       }}
     >
-      <NavContent data={data} slots={slots} workspaces={workspaces} />
+      <NavContent
+        data={data.map((item) => ({ ...item, title: t(item.title) }))}
+        slots={slots}
+        workspaces={workspaces}
+      />
     </Box>
   );
 }
@@ -175,8 +180,6 @@ export function NavContent({ data, slots, workspaces, sx }: NavContentProps) {
       </Scrollbar>
 
       {slots?.bottomArea}
-
-      
     </>
   );
 }
