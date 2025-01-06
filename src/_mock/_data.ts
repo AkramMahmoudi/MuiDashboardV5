@@ -112,7 +112,7 @@ export const _langs = [
   {
     value: 'ar',
     label: 'العربية',
-    icon: '/assets/icons/flags/ic-flag-fr.svg',
+    icon: '/assets/icons/flags/sa.png',
   },
 ];
 
